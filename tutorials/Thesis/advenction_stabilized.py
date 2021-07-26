@@ -8,7 +8,7 @@ from dolfin import *
 from rbnics import *
 from problems import *
 from reduction_methods import *
-
+import numpy as np
 
 @OnlineStabilization()
 class AdvectionDominated(EllipticCoerciveProblem):
@@ -26,11 +26,11 @@ class AdvectionDominated(EllipticCoerciveProblem):
         self.dx = Measure("dx")(subdomain_data=subdomains)
         self.ds = Measure("ds")(subdomain_data=boundaries)
         # Store forcing expression and boundary conditions
-        self.f = Constant(0.)
+        self.f = Constant(1.0)
         self.bc1 = Constant(1.0)
         self.bc2 = Expression("0.0 + 1.0*(x[0] == 0.0)*(x[1] == 0.25)", element=self.V.ufl_element())
         # Store terms related to stabilization
-        self.delta = 1.0
+        self.delta = 0.7 # delta_k on the notes of Torlo
         self.h = CellDiameter(V.mesh())
 
     # Return custom problem name
@@ -41,16 +41,16 @@ class AdvectionDominated(EllipticCoerciveProblem):
     def compute_theta(self, term):
         mu = self.mu
         if term == "a":
-            theta_a0 = 10**(- mu[1])
-            theta_a1 = cos(mu[0])
-            theta_a2 = sin(mu[0])
+            theta_a0 = 1/(- mu[0])
+            theta_a1 = cos(mu[1])
+            theta_a2 = sin(mu[1])
             if self.stabilized:
                 delta = self.delta
-                theta_a3 = - delta * 10**(- mu[1]) * cos(mu[0])
-                theta_a4 = - delta * 10**(- mu[1]) * sin(mu[0])
-                theta_a5 = delta * cos(mu[0])**2
-                theta_a6 = delta * cos(mu[0]) * sin(mu[0])
-                theta_a7 = delta * sin(mu[0])**2
+                theta_a3 = delta * cos(mu[1])
+                theta_a4 = delta * sin(mu[1])
+                theta_a5 = delta * cos(mu[1])**2
+                theta_a6 = delta * cos(mu[1]) * sin(mu[1])
+                theta_a7 = delta * sin(mu[1])**2
             else:
                 theta_a3 = 0.0
                 theta_a4 = 0.0
@@ -62,8 +62,8 @@ class AdvectionDominated(EllipticCoerciveProblem):
             theta_f0 = 1.0
             if self.stabilized:
                 delta = self.delta
-                theta_f1 = delta * cos(mu[0])
-                theta_f2 = delta * sin(mu[0])
+                theta_f1 = delta * cos(mu[1])
+                theta_f2 = delta * sin(mu[1])
             else:
                 theta_f1 = 0.0
                 theta_f2 = 0.0
@@ -119,7 +119,7 @@ V = FunctionSpace(mesh, "Lagrange", 2)
 
 # 3. Allocate an object of the AdvectionDominated class
 problem = AdvectionDominated(V, subdomains=subdomains, boundaries=boundaries)
-mu_range = [(0.5, 1.0), (4.0, 5.0)]
+mu_range = [(0.5, 5e4), (0, 4)]
 problem.set_mu_range(mu_range)
 
 # 4. Prepare reduction with a reduced basis method
@@ -128,13 +128,13 @@ reduction_method.set_Nmax(50)
 reduction_method.set_tolerance(1e-7)
 
 # 5. Perform the offline phase
-lifting_mu = (1.0, 4.0)
+lifting_mu = (0, 0)
 problem.set_mu(lifting_mu)
 reduction_method.initialize_training_set(200)
 reduced_problem = reduction_method.offline()
 
 # 6. Perform an online solve
-online_mu = (0.5, 5.0)
+online_mu = (20000, 0)
 reduced_problem.set_mu(online_mu)
 reduced_problem.solve(online_stabilization=True)
 reduced_problem.export_solution(filename="online_solution_with_stabilization")
