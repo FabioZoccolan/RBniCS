@@ -61,9 +61,9 @@ class AdvectionDominated(EllipticCoerciveProblem):
                 theta_a5 = 0.0
             return (theta_a0, theta_a1, theta_a2, theta_a3, theta_a4, theta_a5)
         elif term == "f":
-            theta_f0 =  -1/(mu[0])
-            theta_f1 = - cos(mu[1])
-            theta_f2 = - sin(mu[1])
+            theta_f0 =0.0 #  -1/(mu[0])
+            theta_f1 = 0.0 #- cos(mu[1])
+            theta_f2 = 0.0#- sin(mu[1])
             
             if self.stabilized:
                 delta = self.delta

@@ -60,11 +60,11 @@ class AdvectionDominated(EllipticCoerciveProblem):
                 theta_a6 = 0.0
             return (theta_a0, theta_a1, theta_a2, theta_a3, theta_a4, theta_a5, theta_a6)
         elif term == "f":
-            theta_f0 = -1/(mu[0])
-            theta_f1 = -4.0
-            theta_f2 = -1/(mu[0])
-            theta_f3 = -1/(mu[0])
-            theta_f4 = -4.0
+            theta_f0 = 0.0 #-1/(mu[0])
+            theta_f1 = 0.0 #-4.0
+            theta_f2 = 0.0 #-1/(mu[0])
+            theta_f3 = 0.0 #-1/(mu[0])
+            theta_f4 = 0.0 #-4.0
             if self.stabilized:
                 delta = self.delta
                 theta_f5 = -delta * 4.0
@@ -87,13 +87,13 @@ class AdvectionDominated(EllipticCoerciveProblem):
             u = self.u
             vel = self.vel
             h = self.h
-            a0 = inner(grad(u), grad(v)) * dx #(1)
-            a1 = vel * u.dx(0) * v * dx #(1)
+            a0 = inner(grad(u), grad(v)) * dx(1)
+            a1 = vel * u.dx(0) * v * dx(1)
             a2 = u.dx(0) * v.dx(0) * dx(2)
             a3 = u.dx(0) * v.dx(1) * dx(2)
             a4 = vel * u.dx(0) * v * dx(2)
-            a5 = h * vel * u.dx(0) * v.dx(0) * dx #(1)
-            a6 = h * vel * u.dx(0) * v.dx(0) * dx #(2) # see if the domain of integration is the first and not the second one
+            a5 = h * vel * u.dx(0) * v.dx(0) * dx(1) #in case, change the domain of integration 1,2 >> all the domain
+            a6 = h * vel * u.dx(0) * v.dx(0) * dx(2) # see if the domain of integration is the first and not the second one
             return (a0, a1, a2, a3, a4, a5, a6)
         elif term == "f":
             l = self.lifting
@@ -104,8 +104,8 @@ class AdvectionDominated(EllipticCoerciveProblem):
             f2 = l.dx(0) * v.dx(0) * dx(2)
             f3 = l.dx(0) * v.dx(1) * dx(2)
             f4 = vel * l.dx(0) * v * dx(2)
-            f5 = h * vel * l.dx(0) * v.dx(0) * dx #(1)
-            f6 = h * vel * l.dx(0) * v.dx(0) * dx #(2) # see if the domain of integration is the first and not the second one
+            f5 = h * vel * l.dx(0) * v.dx(0) * dx(1)
+            f6 = h * vel * l.dx(0) * v.dx(0) * dx(2) # see if the domain of integration is the first and not the second one
             return (f0, f1, f2, f3, f4, f5, f6)
         elif term == "dirichlet_bc":
             bc0 = [DirichletBC(self.V, Constant(0.0), self.boundaries, 1),
@@ -139,9 +139,9 @@ problem.init()
 problem.set_mu_range(mu_range)
 offline_mu = (1e5, 0.0)
 
-#problem.set_mu(offline_mu)
-#problem.solve()
-#problem.export_solution(filename="offline_solution_with_stabilization")
+problem.set_mu(offline_mu)
+problem.solve()
+problem.export_solution(filename="FEM_offline_solution")
 
 
 # 4. Prepare reduction with a reduced basis method
@@ -150,13 +150,13 @@ reduction_method.set_Nmax(50)
 reduction_method.set_tolerance(1e-7)
 
 # 5. Perform the offline phase
-lifting_mu = (1.0, 0.0)
+lifting_mu = (1e5, 1.0)
 problem.set_mu(lifting_mu)
 reduction_method.initialize_training_set(200)
 reduced_problem = reduction_method.offline()
 
 # 6. Perform an online solve
-online_mu = (1e5, 0.0) 
+online_mu = (1e5, 1.0) 
 reduced_problem.set_mu(online_mu)
 reduced_problem.solve(online_stabilization=True)
 reduced_problem.export_solution(filename="online_solution_with_stabilization")
