@@ -1,0 +1,47 @@
+SQUARE
+
+N = 187
+file .py: SquareAdvectionRB_NOTSTAB_N_184
+AdvectionSquareRB_N_187_NOTSTAB_mu_2e4_0.8   N=187 h=0.1262 mu=2e4 0.8 
+file .py: SquareAdvectionRB_N_184
+AdvectionSquareRB_N_187_STAB_mu_2e4_0.8       N=187 h=0.1262 mu=2e4 0.8 delta=2.1
+
+N = 15676
+file .py: SquareAdvectionRB_NOTSTAB_N_15676
+AdvectionSquareRB_N_15676_NOTSTAB_mu_2e4_0.8   N=15676 h=0.0127 mu=2e4 0.8 
+file .py: SquareAdvectionRB_N_15676
+AdvectionSquareRB_N_15676_STAB_mu_2e4_0.8       N=15676 h=0.0127 mu=2e4 0.8 delta=2.1
+
+N = 4652
+file .py: SquareAdvectionRB_NOTSTAB_N_4652
+AdvectionSquareRB_N_4652_NOTSTAB_mu_2e4_0.8   N=4652 h=0.0236 mu=2e4 0.8 
+file .py: SquareAdvectionRB_N_4652
+AdvectionSquareRB_N_4652_STAB_mu_2e4_0.8        N=4652 h=0.0236 mu=2e4 0.0 delta=0.7
+AdvectionSquareRB_N_4652_STAB_mu_2e4_0.8        N=4652 h=0.0236 mu=2e4 0.0 delta=1.4
+AdvectionSquareRB_N_4652_STAB_mu_2e4_0.8        N=4652 h=0.0236 mu=2e4 0.0 delta=2.1
+AdvectionSquareRB_N_4652_STAB_mu_2e4_0.8        N=4652 h=0.0236 mu=2e4 0.4 delta=0.7
+AdvectionSquareRB_N_4652_STAB_mu_2e4_0.8        N=4652 h=0.0236 mu=2e4 0.4 delta=1.4
+AdvectionSquareRB_N_4652_STAB_mu_2e4_0.8        N=4652 h=0.0236 mu=2e4 0.4 delta=2.1
+AdvectionSquareRB_N_4652_STAB_mu_2e4_0.8        N=4652 h=0.0236 mu=2e4 0.8 delta=0.7
+AdvectionSquareRB_N_4652_STAB_mu_2e4_0.8        N=4652 h=0.0236 mu=2e4 0.8 delta=1.4
+AdvectionSquareRB_N_4652_STAB_mu_2e4_0.8        N=4652 h=0.0236 mu=2e4 0.8 delta=2.1
+AdvectionSquareRB_N_4652_STAB_mu_2e4_0.8        N=4652 h=0.0236 mu=2e4 1.2 delta=0.7
+AdvectionSquareRB_N_4652_STAB_mu_2e4_0.8        N=4652 h=0.0236 mu=2e4 1.2 delta=1.4
+AdvectionSquareRB_N_4652_STAB_mu_2e4_0.8        N=4652 h=0.0236 mu=2e4 1.2 delta=2.1
+
+N = 1107
+file .py: SquareAdvectionRB_NOTSTAB_N_1107
+AdvectionSquareRB_N_1107_NOTSTAB_mu_2e4_0.8   N=1107 h=0.0489 mu=2e4 0.8 
+file .py: SquareAdvectionRB_N_1107
+AdvectionSquareRB_N_1107_STAB_mu_2e4_0.8        N=1107 h=0.0489 mu=2e4 0.0 delta=0.7
+AdvectionSquareRB_N_1107_STAB_mu_2e4_0.8        N=1107 h=0.0489 mu=2e4 0.0 delta=1.4
+AdvectionSquareRB_N_1107_STAB_mu_2e4_0.8        N=1107 h=0.0489 mu=2e4 0.0 delta=2.1
+AdvectionSquareRB_N_1107_STAB_mu_2e4_0.8        N=1107 h=0.0489 mu=2e4 0.4 delta=0.7
+AdvectionSquareRB_N_1107_STAB_mu_2e4_0.8        N=1107 h=0.0489 mu=2e4 0.4 delta=1.4
+AdvectionSquareRB_N_1107_STAB_mu_2e4_0.8        N=1107 h=0.0489 mu=2e4 0.4 delta=2.1
+AdvectionSquareRB_N_1107_STAB_mu_2e4_0.8        N=1107 h=0.0489 mu=2e4 0.8 delta=0.7
+AdvectionSquareRB_N_1107_STAB_mu_2e4_0.8        N=1107 h=0.0489 mu=2e4 0.8 delta=1.4
+AdvectionSquareRB_N_1107_STAB_mu_2e4_0.8        N=1107 h=0.0489 mu=2e4 0.8 delta=2.1
+AdvectionSquareRB_N_1107_STAB_mu_2e4_0.8        N=1107 h=0.0489 mu=2e4 1.2 delta=0.7
+AdvectionSquareRB_N_1107_STAB_mu_2e4_0.8        N=1107 h=0.0489 mu=2e4 1.2 delta=1.4
+AdvectionSquareRB_N_1107_STAB_mu_2e4_0.8        N=1107 h=0.0489 mu=2e4 1.2 delta=2.1

@@ -1,0 +1,29 @@
+GRAETZ
+
+1 EXAMPLE
+
+N = 3211
+file .py: SquareAdvectionRB_NOTSTAB_N_3211
+AdvectionSquareRB_N_3211_NOTSTAB_mu_1e5   N=3211 h=0.0402 mu=1e5 1.0
+file .py: SquareAdvectionRB_N_3211
+AdvectionSquareRB_1_N_3211_STAB_mu_1e5_d_1     N=3211 h=0.0402 mu=1e5 1.0 delta=1
+
+N = 5503
+file .py: SquareAdvectionRB_NOTSTAB_N_5503
+AdvectionSquareRB_N_5503_NOTSTAB_mu_1.0   N=5503 h=0.0310 mu=1.0 1.0
+AdvectionSquareRB_N_5503_NOTSTAB_mu_6.0   N=5503 h=0.0310 mu=6.0 1.0
+AdvectionSquareRB_N_5503_NOTSTAB_mu_10.0   N=5503 h=0.0310 mu=10.0 1.0
+AdvectionSquareRB_N_5503_NOTSTAB_mu_1e5   N=5503 h=0.0310 mu=1e5 1.0
+file .py: SquareAdvectionRB_N_5503
+AdvectionSquareRB_1_N_5503_STAB_mu_1.0_d_1     N=5503 h=0.0310 mu=1.0 1.0 delta=1
+AdvectionSquareRB_1_N_5503_STAB_mu_6.0_d_1     N=5503 h=0.0310 mu=6.0 1.0 delta=1
+AdvectionSquareRB_1_N_5503_STAB_mu_10.0_d_1     N=5503 h=0.0310 mu=10.0 1.0 delta=1
+AdvectionSquareRB_1_N_5503_STAB_mu_1e5_d_1     N=5503 h=0.0310 mu=1e5 1.0 delta=1
+
+N = 17959
+file .py: SquareAdvectionRB_NOTSTAB_N_17959
+AdvectionSquareRB_N_17959_NOTSTAB_mu_1e5   N=17959 h=0.0168 mu=1e5 1.0 
+file .py: SquareAdvectionRB_N_17959
+AdvectionSquareRB_1_N_17959_STAB_mu_1e5_d_1     N=17959 h=0.0168 mu=1e5 1.0 delta=1
+
+
