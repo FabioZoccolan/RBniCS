@@ -3,12 +3,11 @@ from rbnics import *
 from problems import *
 from reduction_methods import *
 
+"""### 3. Affine Decomposition
 
-# ### Affine Decomposition
+For this problem the affine decomposition is straightforward.
+"""
 
-
-
-#@OnlineStabilization()
 class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Default initialization of members
@@ -27,14 +26,10 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         self.ds = Measure("ds")(subdomain_data=boundaries)
         # Regularization coefficient
         self.alpha = 0.01
-        # Desired state
-        self.y_d = Constant(0.5)
-        
-        self.delta = 2.1
-        
-        self.h = CellDiameter(V.mesh())
-        self.bc1 = Constant(1.0)
-        self.bc2 = Expression("0.0 + 1.0*(x[0] == 0.0)*(x[1] == 0.25)", element=self.V.ufl_element())
+        self.y_d = Constant(1.0)
+        # Store the velocity expression
+        self.vel = Expression("x[1] * (1 - x[1])", element=self.V.sub(0).ufl_element())
+        self.lifting = Expression('((x[0] >= 1 && x[0] <= 2) && (x[1] == 1.0 || x[1]== 0.0) ) ? 1. : 0.', degree=1, domain=mesh)
         # Customize linear solver parameters
         self._linear_solver_parameters.update({
             "linear_solver": "mumps"
@@ -42,30 +37,19 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Return custom problem name
     def name(self):
-        return "AdvectionOCSquareRB-1_N_3594_mu_2.4_1.2_d_2.1_alpha_0.01_STSTAD"
-
-    # Return stability factor
+        return "AdvectionOCGraetzRB_N_9360_mu_6.0_alpha_0.01"
+        
+        # Return stability factor
     def get_stability_factor_lower_bound(self):
         return 1.
 
     # Return theta multiplicative terms of the affine expansion of the problem.
     def compute_theta(self, term):
         mu = self.mu
-        delta = self.delta
         if term in ("a", "a*"):
             theta_a0 = 1/(mu[0])
-            theta_a1 = cos(mu[1])
-            theta_a2 = sin(mu[1])
-            #if self.stabilized:
-            delta = self.delta
-            theta_a3 = delta * cos(mu[1])**2
-            theta_a4 = delta * cos(mu[1]) * sin(mu[1])
-            theta_a5 = delta * sin(mu[1])**2
-            #else:
-            #    theta_a3 = 0.0
-            #    theta_a4 = 0.0
-            #    theta_a5 = 0.0
-            return (theta_a0, theta_a1, theta_a2, theta_a3, theta_a4, theta_a5)
+            theta_a1 = 4.0
+            return (theta_a0, theta_a1)
         elif term in ("c", "c*"):
             theta_c0 = 1.0
             return (theta_c0,)
@@ -76,20 +60,14 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             theta_n0 = self.alpha
             return (theta_n0,)
         elif term == "f":
-            theta_f0 = 1.0
-            return (theta_f0,)
+            theta_f0 = 0.0
+            return (theta_f0, )
         elif term == "g":
-            theta_g0 = 0.0
-            theta_g1 = 0.0
-            theta_g2 = 0.0
-            theta_g3 = 1.0
-            return (theta_g0, theta_g1, theta_g2, theta_g3)
+            theta_g0 = 1.
+            return (theta_g0,)
         elif term == "h":
-            theta_h0 = 0.0
-            theta_h1 = 0.0
-            theta_h2 = 0.0
-            theta_h3 = 1.0**2
-            return (theta_h0, theta_h1, theta_h2,  theta_h3)
+            theta_h0 = 1.
+            return (theta_h0,)
         elif term == "dirichlet_bc_y":
             theta_bc0 = 1.
             return (theta_bc0,)
@@ -103,25 +81,17 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         if term == "a":
             y = self.y
             q = self.q
-            h = self.h
-            a0 = inner(grad(y), grad(q)) * dx #- inner(grad(l), grad(v)) * dx
-            a1 = y.dx(0) * q * dx #- l.dx(0) * v * dx
-            a2 = y.dx(1) * q * dx #- l.dx(1) * v * dx
-            a3 = h * y.dx(0) * q.dx(0) * dx #- h * l.dx(0) * v.dx(0) * dx
-            a4 = h * y.dx(0) * q.dx(1) * dx + h * y.dx(1) * q.dx(0) * dx #- h * l.dx(0) * v.dx(1) * dx + h * l.dx(1) * v.dx(0) * dx
-            a5 = h * y.dx(1) * q.dx(1) * dx# - h * l.dx(1) * v.dx(1) * dx 
-            return (a0, a1, a2, a3, a4, a5)
+            vel = self.vel
+            a0 = inner(grad(y), grad(q)) * dx(1)
+            a1 = vel * y.dx(0) * q * dx(1)
+            return (a0, a1)
         elif term == "a*":
             z = self.z
             p = self.p
-            h = self.h
-            as0 = inner(grad(z), grad(p)) * dx
-            as1 = - p.dx(0) * z * dx 
-            as2 = - p.dx(1) * z * dx
-            as3 = - h * p.dx(0) * z.dx(0) *  dx(domain=mesh)
-            as4 = - h * p.dx(0) * z.dx(1) * dx(domain=mesh) + h * p.dx(1) * z.dx(0) *  dx(domain=mesh)
-            as5 = - h * p.dx(1) * z.dx(1) *  dx
-            return (as0,as1,as2,as3,as4,as5)
+            vel = self.vel
+            as0 = inner(grad(z), grad(p)) * dx(1)
+            as1 = -vel * p.dx(0) * z * dx(1)
+            return (as0, as1)
         elif term == "c":
             u = self.u
             q = self.q
@@ -147,27 +117,28 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             f0 = Constant(0.0) * q * dx
             return (f0,)
         elif term == "g":
-            z = self.z
             y_d = self.y_d
-            g0 = y_d * z * dx(1, domain=mesh)
-            g1 = y_d * z * dx(2, domain=mesh)
-            g2 = y_d * z * dx(3, domain=mesh)
-            g3 = y_d * z * dx(4, domain=mesh)
-            return (g0, g1, g2, g3)
+            z = self.z
+            g0 = y_d * z * dx(3) + y_d * z * dx(4)
+            return (g0,)
         elif term == "h":
             y_d = self.y_d
-            h0 = y_d * y_d * dx(1, domain=mesh)
-            h1 = y_d * y_d * dx(2, domain=mesh)
-            h2 = y_d * y_d * dx(3, domain=mesh)
-            h3 = y_d * y_d * dx(4, domain=mesh)
-            return (h0, h1, h2, h3)
+            h0 = y_d * y_d * dx(3, domain=mesh) + y_d * y_d * dx(4, domain=mesh)  #RICONTROLLARE
+            return (h0,)
         elif term == "dirichlet_bc_y":
-            bc0 = [DirichletBC(self.V.sub(0), Constant(1.0), self.boundaries, 1),
-                   DirichletBC(self.V.sub(0), Constant(0.0), self.boundaries, 2)]
+            bc0 = [DirichletBC(self.V.sub(0), Constant(0.0), self.boundaries, 1),
+                   DirichletBC(self.V.sub(0), Constant(1.0), self.boundaries, 2),
+                   DirichletBC(self.V.sub(0), Constant(1.0), self.boundaries, 4),
+                   DirichletBC(self.V.sub(0), Constant(0.0), self.boundaries, 5),
+                   DirichletBC(self.V.sub(0), Constant(0.0), self.boundaries, 6)]
             return (bc0,)
         elif term == "dirichlet_bc_p":
             bc0 = [DirichletBC(self.V.sub(2), Constant(0.0), self.boundaries, 1),
-                   DirichletBC(self.V.sub(2), Constant(0.0), self.boundaries, 2)]
+                   DirichletBC(self.V.sub(2), Constant(0.0), self.boundaries, 2),
+                   #DirichletBC(self.V.sub(2), Constant(0.0), self.boundaries, 3), #RICONTROLLARE
+                   DirichletBC(self.V.sub(2), Constant(0.0), self.boundaries, 4),
+                   DirichletBC(self.V.sub(2), Constant(0.0), self.boundaries, 5),
+                   DirichletBC(self.V.sub(2), Constant(0.0), self.boundaries, 6)]
             return (bc0,)
         elif term == "inner_product_y":
             y = self.y
@@ -187,39 +158,38 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         else:
             raise ValueError("Invalid term for assemble_operator().")
 
+"""## 4. Main program
 
-# ## 4. Main program
-# 
-# ### 4.1. Read the mesh for this problem
-# The mesh was generated by the [data/generate_mesh_1.ipynb](data/generate_mesh_1.ipynb) notebook.
+### 4.1. Read the mesh for this problem
+The mesh was generated by the [data/generate_mesh_2.ipynb](https://colab.research.google.com/github/RBniCS/RBniCS/blob/open-in-colab/tutorials/13_elliptic_optimal_control/data/generate_mesh_2.ipynb
+) notebook.
+"""
 
-# In[ ]:
-
-
-mesh = Mesh("data/squareOC_N_3594.xml")
-subdomains = MeshFunction("size_t", mesh, "data/squareOC_N_3594_physical_region.xml")
-boundaries = MeshFunction("size_t", mesh, "data/squareOC_N_3594_facet_region.xml")
+mesh = Mesh("data/graetzOC_N_9360.xml")
+subdomains = MeshFunction("size_t", mesh, "data/graetzOC_N_9360_physical_region.xml")
+boundaries = MeshFunction("size_t", mesh, "data/graetzOC_N_9360_facet_region.xml")
 print("hMax: ", mesh.hmax() )
 
-# ### 4.2. Create Finite Element space (Lagrange P1)
+
+"""### 4.2. Create Finite Element space (Lagrange P1)"""
 
 scalar_element = FiniteElement("Lagrange", mesh.ufl_cell(), 1)
 element = MixedElement(scalar_element, scalar_element, scalar_element)
 V = FunctionSpace(mesh, element, components=["y", "u", "p"])
 print("Dim: ", V.dim() )
 
-# ### 4.3. Allocate an object of the EllipticOptimalControl class
-
+"""### 4.3. Allocate an object of the EllipticOptimalControl class"""
 
 problem = EllipticOptimalControl(V, subdomains=subdomains, boundaries=boundaries)
-mu_range = [(1e4,1e5), (0.0, 6.3)]
+mu_range = [(0.01, 1e6), (0.0, 4.0)]
 problem.set_mu_range(mu_range)
 
-offline_mu = (2e4, 1.2)
+
+offline_mu = (6.0, 1.2)
 problem.init()
 problem.set_mu(offline_mu)
 problem.solve()
-problem.export_solution(filename="FEM_OC_Square_mu_2.4_1.2_d_2.1_alpha_0.01_STSTAD")
+problem.export_solution(filename="FEM_OCGraetz_N_9360_mu_6.0_alpha_0.01")
 
 
 # ### 4.4. Prepare reduction with a reduced basis method
@@ -236,7 +206,7 @@ reduced_basis_method.set_Nmax(20)
 # In[ ]:
 
 
-lifting_mu = (2e4, 1.2)
+lifting_mu = (6.0, 1.2)
 problem.set_mu(lifting_mu)
 reduced_basis_method.initialize_training_set(100)
 reduced_problem = reduced_basis_method.offline()
@@ -247,11 +217,11 @@ reduced_problem = reduced_basis_method.offline()
 # In[ ]:
 
 
-online_mu = (2e4, 1.2)
+online_mu = (6.0, 1.2)
 reduced_problem.set_mu(online_mu)
 reduced_solution = reduced_problem.solve(online_stabilization=True)
 print("Reduced output for mu =", online_mu, "is", reduced_problem.compute_output())
-reduced_problem.export_solution(filename="online_solution_OC_Square_mu_2.4_1.2_d_2.1_alpha_0.01_STSTAD")
+reduced_problem.export_solution(filename="online_solution_OCGraetz_N_9360_mu_6.0_alpha_0.01")
 
 # In[ ]:
 

@@ -211,7 +211,7 @@ print("Dim: ", V.dim() )
 
 
 problem = EllipticOptimalControl(V, subdomains=subdomains, boundaries=boundaries)
-mu_range = [(1e4,5e5), (0.0, 6.3)]
+mu_range = [(1e4,1e5), (0.0, 6.3)]
 problem.set_mu_range(mu_range)
 
 offline_mu = (2e4, 1.2)
@@ -248,7 +248,7 @@ reduced_problem = reduced_basis_method.offline()
 
 online_mu = (2e4, 1.2)
 reduced_problem.set_mu(online_mu)
-reduced_solution = reduced_problem.solve()
+reduced_solution = reduced_problem.solve(online_stabilization=True)
 print("Reduced output for mu =", online_mu, "is", reduced_problem.compute_output())
 reduced_problem.export_solution(filename="online_solution_OC_Square_mu_2.4_1.2_d_2.1_alpha_0.01_STST")
 

@@ -219,7 +219,7 @@ reduced_problem = reduced_basis_method.offline()
 
 online_mu = (6.0, 1.2)
 reduced_problem.set_mu(online_mu)
-reduced_solution = reduced_problem.solve()
+reduced_solution = reduced_problem.solve(online_stabilization=True)
 print("Reduced output for mu =", online_mu, "is", reduced_problem.compute_output())
 reduced_problem.export_solution(filename="online_solution_OCGraetzmu_6.0_alpha_0.01")
 
