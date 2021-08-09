@@ -42,7 +42,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Return custom problem name
     def name(self):
-        return "AdvectionOCSquareRB-1_N_3594_mu_2.4_1.2_d_2.1_alpha_0.01_STSTAD"
+        return "AdvectionOCSquareRB-1_N_3594_mu_2.4_1.2_d_2.1_alpha_STSTAD_0.01"
 
     # Return stability factor
     def get_stability_factor_lower_bound(self):
@@ -219,7 +219,7 @@ offline_mu = (2e4, 1.2)
 problem.init()
 problem.set_mu(offline_mu)
 problem.solve()
-problem.export_solution(filename="FEM_OC_Square_mu_2.4_1.2_d_2.1_alpha_0.01_STSTAD")
+problem.export_solution(filename="FEM_OC_Square_N_3594_mu_2.4_1.2_d_2.1_alpha_0.01_STSTAD")
 
 
 # ### 4.4. Prepare reduction with a reduced basis method
@@ -251,7 +251,7 @@ online_mu = (2e4, 1.2)
 reduced_problem.set_mu(online_mu)
 reduced_solution = reduced_problem.solve(online_stabilization=True)
 print("Reduced output for mu =", online_mu, "is", reduced_problem.compute_output())
-reduced_problem.export_solution(filename="online_solution_OC_Square_mu_2.4_1.2_d_2.1_alpha_0.01_STSTAD")
+reduced_problem.export_solution(filename="online_solution_OC_Square_N_3594_mu_2.4_1.2_d_2.1_alpha_0.01_STSTAD")
 
 # In[ ]:
 

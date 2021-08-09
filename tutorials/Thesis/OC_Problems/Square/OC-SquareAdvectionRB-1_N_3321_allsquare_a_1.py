@@ -26,9 +26,9 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         self.dx = Measure("dx")(subdomain_data=subdomains)
         self.ds = Measure("ds")(subdomain_data=boundaries)
         # Regularization coefficient
-        self.alpha = 0.01
+        self.alpha = 1.0
         # Desired state
-        self.y_d = Constant(0.5)
+        self.y_d = Constant(1.0)
         self.bc1 = Constant(1.0)
         self.bc2 = Expression("0.0 + 1.0*(x[0] == 0.0)*(x[1] == 0.25)", element=self.V.ufl_element())
         # Customize linear solver parameters
@@ -38,7 +38,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Return custom problem name
     def name(self):
-        return "AdvectionOCSquareRB-1_N_3594_mu_2.4_1.2_alpha_0.01"
+        return "AdvectionOCSquareRB_N_3321_mu_2.4_1.2_alpha_1_allsquare"
 
     # Return stability factor
     def get_stability_factor_lower_bound(self):
@@ -65,17 +65,13 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             theta_f0 = 1.0
             return (theta_f0,)
         elif term == "g":
-            theta_g0 = 0.0
-            theta_g1 = 0.0
-            theta_g2 = 0.0
-            theta_g3 = 1.0
-            return (theta_g0, theta_g1, theta_g2, theta_g3)
+            theta_g0 = 1.0
+            theta_g1 = 1.0
+            return (theta_g0, theta_g1)
         elif term == "h":
-            theta_h0 = 0.0
-            theta_h1 = 0.0
-            theta_h2 = 0.0
-            theta_h3 = 1.0**2
-            return (theta_h0, theta_h1, theta_h2,  theta_h3)
+            theta_h0 = 1.0
+            theta_h1 = 1.0**2
+            return (theta_h0, theta_h1 )
         elif term == "dirichlet_bc_y":
             theta_bc0 = 1.
             return (theta_bc0,)
@@ -129,16 +125,12 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             y_d = self.y_d
             g0 = y_d * z * dx(1, domain=mesh)
             g1 = y_d * z * dx(2, domain=mesh)
-            g2 = y_d * z * dx(3, domain=mesh)
-            g3 = y_d * z * dx(4, domain=mesh)
-            return (g0, g1, g2, g3)
+            return (g0, g1)
         elif term == "h":
             y_d = self.y_d
             h0 = y_d * y_d * dx(1, domain=mesh)
             h1 = y_d * y_d * dx(2, domain=mesh)
-            h2 = y_d * y_d * dx(3, domain=mesh)
-            h3 = y_d * y_d * dx(4, domain=mesh)
-            return (h0, h1, h2, h3)
+            return (h0, h1)
         elif term == "dirichlet_bc_y":
             bc0 = [DirichletBC(self.V.sub(0), Constant(1.0), self.boundaries, 1),
                    DirichletBC(self.V.sub(0), Constant(0.0), self.boundaries, 2)]
@@ -174,9 +166,9 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 # In[ ]:
 
 
-mesh = Mesh("data/squareOC_N_3594.xml")
-subdomains = MeshFunction("size_t", mesh, "data/squareOC_N_3594_physical_region.xml")
-boundaries = MeshFunction("size_t", mesh, "data/squareOC_N_3594_facet_region.xml")
+mesh = Mesh("data/square_N_3321.xml")
+subdomains = MeshFunction("size_t", mesh, "data/square_N_3321_physical_region.xml")
+boundaries = MeshFunction("size_t", mesh, "data/square_N_3321_facet_region.xml")
 print("hMax: ", mesh.hmax() )
 
 # ### 4.2. Create Finite Element space (Lagrange P1)
@@ -197,7 +189,7 @@ offline_mu = (2e4, 1.2)
 problem.init()
 problem.set_mu(offline_mu)
 problem.solve()
-problem.export_solution(filename="FEM_OC_Square_N_3594_mu_2.4_1.2_alpha_0.01")
+problem.export_solution(filename="FEM_OC_Square_N_3321_mu_2.4_1.2_alpha_1_allsquare")
 
 
 # ### 4.4. Prepare reduction with a reduced basis method
@@ -229,7 +221,7 @@ online_mu = (2e4, 1.2)
 reduced_problem.set_mu(online_mu)
 reduced_solution = reduced_problem.solve()
 print("Reduced output for mu =", online_mu, "is", reduced_problem.compute_output())
-reduced_problem.export_solution(filename="online_solution_N_3594_mu_2.4_1.2_alpha_0.01")
+reduced_problem.export_solution(filename="online_solution_OC_Square_N_3321_mu_2.4_1.2_alpha_1_allsquare")
 
 # In[ ]:
 

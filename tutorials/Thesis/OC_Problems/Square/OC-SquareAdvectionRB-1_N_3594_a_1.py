@@ -26,7 +26,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         self.dx = Measure("dx")(subdomain_data=subdomains)
         self.ds = Measure("ds")(subdomain_data=boundaries)
         # Regularization coefficient
-        self.alpha = 0.01
+        self.alpha = 1.0
         # Desired state
         self.y_d = Constant(0.5)
         self.bc1 = Constant(1.0)
@@ -38,7 +38,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Return custom problem name
     def name(self):
-        return "AdvectionOCSquareRB-1_N_3594_mu_2.4_1.2_alpha_0.01"
+        return "AdvectionOCSquareRB-1_N_3594_mu_2.4_1.2_alpha_1"
 
     # Return stability factor
     def get_stability_factor_lower_bound(self):
@@ -197,7 +197,7 @@ offline_mu = (2e4, 1.2)
 problem.init()
 problem.set_mu(offline_mu)
 problem.solve()
-problem.export_solution(filename="FEM_OC_Square_N_3594_mu_2.4_1.2_alpha_0.01")
+problem.export_solution(filename="FEM_OC_Square_N_3594_mu_2.4_1.2_alpha_1")
 
 
 # ### 4.4. Prepare reduction with a reduced basis method
@@ -229,7 +229,7 @@ online_mu = (2e4, 1.2)
 reduced_problem.set_mu(online_mu)
 reduced_solution = reduced_problem.solve()
 print("Reduced output for mu =", online_mu, "is", reduced_problem.compute_output())
-reduced_problem.export_solution(filename="online_solution_N_3594_mu_2.4_1.2_alpha_0.01")
+reduced_problem.export_solution(filename="online_solution_N_3594_mu_2.4_1.2_alpha_1")
 
 # In[ ]:
 
