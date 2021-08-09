@@ -122,7 +122,7 @@ print("FE dim", V.dim())
 
 # 3. Allocate an object of the AdvectionDominated class
 problem = AdvectionDominated(V, subdomains=subdomains, boundaries=boundaries)
-mu_range = [(0.01, 1e6), (0.0,4.0)]
+mu_range = [(0.01, 1e6), (0.5,4.0)]
 problem.init()
 problem.set_mu_range(mu_range)
 offline_mu = (1.0, 1.0)

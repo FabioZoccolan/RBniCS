@@ -119,11 +119,11 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         elif term == "g":
             y_d = self.y_d
             z = self.z
-            g0 = y_d * z * dx(2) + y_d * z * dx(4)
+            g0 = y_d * z * dx(3) + y_d * z * dx(4)
             return (g0,)
         elif term == "h":
             y_d = self.y_d
-            h0 = y_d * y_d * dx(2, domain=mesh) + y_d * y_d * dx(4, domain=mesh)  #RICONTROLLARE
+            h0 = y_d * y_d * dx(3, domain=mesh) + y_d * y_d * dx(4, domain=mesh)  #RICONTROLLARE
             return (h0,)
         elif term == "dirichlet_bc_y":
             bc0 = [DirichletBC(self.V.sub(0), Constant(0.0), self.boundaries, 1),
@@ -181,15 +181,15 @@ print("Dim: ", V.dim() )
 """### 4.3. Allocate an object of the EllipticOptimalControl class"""
 
 problem = EllipticOptimalControl(V, subdomains=subdomains, boundaries=boundaries)
-mu_range = [(0.01, 1e6), (0.0, 4.0)]
+mu_range = [(0.01, 1e6), (0.5, 4.0)]
 problem.set_mu_range(mu_range)
 
 
-offline_mu = (2e4, 1.2)
+offline_mu = (1e5, 1.2)
 problem.init()
 problem.set_mu(offline_mu)
 problem.solve()
-problem.export_solution(filename="FEM_OCGraetz_mu_1e5_alpha_0.01")
+problem.export_solution(filename="FEM_OCGraetz_N_18798_mu_1e5_alpha_0.01")
 
 
 # ### 4.4. Prepare reduction with a reduced basis method
@@ -206,7 +206,7 @@ reduced_basis_method.set_Nmax(20)
 # In[ ]:
 
 
-lifting_mu = (2e4, 1.2)
+lifting_mu = (1e5, 1.2)
 problem.set_mu(lifting_mu)
 reduced_basis_method.initialize_training_set(100)
 reduced_problem = reduced_basis_method.offline()
@@ -217,11 +217,11 @@ reduced_problem = reduced_basis_method.offline()
 # In[ ]:
 
 
-online_mu = (2e4, 1.2)
+online_mu = (1e5, 1.2)
 reduced_problem.set_mu(online_mu)
-reduced_solution = reduced_problem.solve()
+reduced_solution = reduced_problem.solve(online_stabilization=True)
 print("Reduced output for mu =", online_mu, "is", reduced_problem.compute_output())
-reduced_problem.export_solution(filename="online_solution_OCGraetzmu_1e5_alpha_0.01")
+reduced_problem.export_solution(filename="online_solution_OCGraetz_N_18798_mu_1e5_alpha_0.01")
 
 # In[ ]:
 

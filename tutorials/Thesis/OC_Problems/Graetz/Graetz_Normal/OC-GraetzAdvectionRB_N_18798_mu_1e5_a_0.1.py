@@ -25,7 +25,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         self.dx = Measure("dx")(subdomain_data=subdomains)
         self.ds = Measure("ds")(subdomain_data=boundaries)
         # Regularization coefficient
-        self.alpha = 0.01
+        self.alpha = 0.1
         self.y_d = Constant(1.0)
         # Store the velocity expression
         self.vel = Expression("x[1] * (1 - x[1])", element=self.V.sub(0).ufl_element())
@@ -37,7 +37,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Return custom problem name
     def name(self):
-        return "AdvectionOCGraetzRB_N_18798_mu_1e5_alpha_0.01"
+        return "AdvectionOCGraetzRB_N_18798_mu_1e5_alpha_0.1"
         
         # Return stability factor
     def get_stability_factor_lower_bound(self):
@@ -82,15 +82,15 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             y = self.y
             q = self.q
             vel = self.vel
-            a0 = inner(grad(y), grad(q)) * dx(1)
-            a1 = vel * y.dx(0) * q * dx(1)
+            a0 = inner(grad(y), grad(q)) * dx
+            a1 = vel * y.dx(0) * q * dx
             return (a0, a1)
         elif term == "a*":
             z = self.z
             p = self.p
             vel = self.vel
-            as0 = inner(grad(z), grad(p)) * dx(1)
-            as1 = -vel * p.dx(0) * z * dx(1)
+            as0 = inner(grad(z), grad(p)) * dx
+            as1 = -vel * p.dx(0) * z * dx
             return (as0, as1)
         elif term == "c":
             u = self.u
@@ -181,15 +181,15 @@ print("Dim: ", V.dim() )
 """### 4.3. Allocate an object of the EllipticOptimalControl class"""
 
 problem = EllipticOptimalControl(V, subdomains=subdomains, boundaries=boundaries)
-mu_range = [(0.01, 1e6), (0.0, 4.0)]
+mu_range = [(0.01, 1e6), (0.5, 4.0)]
 problem.set_mu_range(mu_range)
 
 
-offline_mu = (2e4, 1.2)
+offline_mu = (1e5, 1.2)
 problem.init()
 problem.set_mu(offline_mu)
 problem.solve()
-problem.export_solution(filename="FEM_OCGraetz_mu_1e5_alpha_0.01")
+problem.export_solution(filename="FEM_OCGraetz_N_18798__mu_1e5_alpha_0.1")
 
 
 # ### 4.4. Prepare reduction with a reduced basis method
@@ -206,7 +206,7 @@ reduced_basis_method.set_Nmax(20)
 # In[ ]:
 
 
-lifting_mu = (2e4, 1.2)
+lifting_mu = (1e5, 1.2)
 problem.set_mu(lifting_mu)
 reduced_basis_method.initialize_training_set(100)
 reduced_problem = reduced_basis_method.offline()
@@ -217,11 +217,11 @@ reduced_problem = reduced_basis_method.offline()
 # In[ ]:
 
 
-online_mu = (2e4, 1.2)
+online_mu = (1e5, 1.2)
 reduced_problem.set_mu(online_mu)
 reduced_solution = reduced_problem.solve(online_stabilization=True)
 print("Reduced output for mu =", online_mu, "is", reduced_problem.compute_output())
-reduced_problem.export_solution(filename="online_solution_OCGraetzmu_1e5_alpha_0.01")
+reduced_problem.export_solution(filename="online_solution_OCGraetz_N_18798_mu_1e5_alpha_0.1")
 
 # In[ ]:
 

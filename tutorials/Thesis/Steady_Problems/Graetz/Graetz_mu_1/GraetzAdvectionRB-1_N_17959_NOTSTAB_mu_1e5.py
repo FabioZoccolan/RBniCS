@@ -122,14 +122,14 @@ print("FE dim", V.dim())
 
 # 3. Allocate an object of the AdvectionDominated class
 problem = AdvectionDominated(V, subdomains=subdomains, boundaries=boundaries)
-mu_range = [(0.01, 1e6), (0.0,4.0)]
+mu_range = [(0.01, 1e6), (0.5,4.0)]
 problem.init()
 problem.set_mu_range(mu_range)
 offline_mu = (1e5, 1.0)
 
 problem.set_mu(offline_mu)
 problem.solve()
-problem.export_solution(filename="FEM_Graetz_N_17959_NOTSTAB_mu_1e5")
+problem.export_solution(filename="FEM_Graetz_N_17959_NOTSTAB_mu_1e")
 
 
 # 4. Prepare reduction with a reduced basis method

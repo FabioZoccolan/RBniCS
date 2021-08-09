@@ -82,15 +82,15 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             y = self.y
             q = self.q
             vel = self.vel
-            a0 = inner(grad(y), grad(q)) * dx(1)
-            a1 = vel * y.dx(0) * q * dx(1)
+            a0 = inner(grad(y), grad(q)) * dx
+            a1 = vel * y.dx(0) * q * dx
             return (a0, a1)
         elif term == "a*":
             z = self.z
             p = self.p
             vel = self.vel
-            as0 = inner(grad(z), grad(p)) * dx(1)
-            as1 = -vel * p.dx(0) * z * dx(1)
+            as0 = inner(grad(z), grad(p)) * dx
+            as1 = -vel * p.dx(0) * z * dx
             return (as0, as1)
         elif term == "c":
             u = self.u
@@ -181,7 +181,7 @@ print("Dim: ", V.dim() )
 """### 4.3. Allocate an object of the EllipticOptimalControl class"""
 
 problem = EllipticOptimalControl(V, subdomains=subdomains, boundaries=boundaries)
-mu_range = [(0.01, 1e6), (0.0, 4.0)]
+mu_range = [(0.01, 1e6), (0.5, 4.0)]
 problem.set_mu_range(mu_range)
 
 

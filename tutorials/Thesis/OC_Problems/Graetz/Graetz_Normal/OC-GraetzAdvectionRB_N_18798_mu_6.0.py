@@ -82,15 +82,15 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             y = self.y
             q = self.q
             vel = self.vel
-            a0 = inner(grad(y), grad(q)) * dx(1)
-            a1 = vel * y.dx(0) * q * dx(1)
+            a0 = inner(grad(y), grad(q)) * dx
+            a1 = vel * y.dx(0) * q * dx
             return (a0, a1)
         elif term == "a*":
             z = self.z
             p = self.p
             vel = self.vel
-            as0 = inner(grad(z), grad(p)) * dx(1)
-            as1 = -vel * p.dx(0) * z * dx(1)
+            as0 = inner(grad(z), grad(p)) * dx
+            as1 = -vel * p.dx(0) * z * dx
             return (as0, as1)
         elif term == "c":
             u = self.u
@@ -189,7 +189,7 @@ offline_mu = (6.0, 1.2)
 problem.init()
 problem.set_mu(offline_mu)
 problem.solve()
-problem.export_solution(filename="FEM_OCGraetz_mu_6.0_alpha_0.01")
+problem.export_solution(filename="FEM_OCGraetz_N_18798_mu_6.0_alpha_0.01")
 
 
 # ### 4.4. Prepare reduction with a reduced basis method
@@ -221,7 +221,7 @@ online_mu = (6.0, 1.2)
 reduced_problem.set_mu(online_mu)
 reduced_solution = reduced_problem.solve(online_stabilization=True)
 print("Reduced output for mu =", online_mu, "is", reduced_problem.compute_output())
-reduced_problem.export_solution(filename="online_solution_OCGraetzmu_6.0_alpha_0.01")
+reduced_problem.export_solution(filename="online_solution_OCGraetz_N_18798_mu_6.0_alpha_0.01")
 
 # In[ ]:
 
