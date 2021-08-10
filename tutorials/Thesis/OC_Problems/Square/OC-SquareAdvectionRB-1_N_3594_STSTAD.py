@@ -56,15 +56,15 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             theta_a0 = 1/(mu[0])
             theta_a1 = cos(mu[1])
             theta_a2 = sin(mu[1])
-            #if self.stabilized:
-            delta = self.delta
-            theta_a3 = delta * cos(mu[1])**2
-            theta_a4 = delta * cos(mu[1]) * sin(mu[1])
-            theta_a5 = delta * sin(mu[1])**2
-            #else:
-            #    theta_a3 = 0.0
-            #    theta_a4 = 0.0
-            #    theta_a5 = 0.0
+            if self.stabilized:
+             delta = self.delta
+             theta_a3 = delta * cos(mu[1])**2
+             theta_a4 = delta * cos(mu[1]) * sin(mu[1])
+             theta_a5 = delta * sin(mu[1])**2
+            else:
+              theta_a3 = 0.0
+              theta_a4 = 0.0
+              theta_a5 = 0.0
             return (theta_a0, theta_a1, theta_a2, theta_a3, theta_a4, theta_a5)
         elif term in ("c", "c*"):
             theta_c0 = 1.0

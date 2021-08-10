@@ -32,7 +32,15 @@ file .py OC-GraetzAdvectionRB_N_9360_STSTAD_mu_6.0_a_1
 AdvectionOCGraetzRB_N_9360_STSTAD_mu_6.0_alpha_1 = yd nei due rettangolini sopra e sotto nella seconda parte del dominio, mu = 6.0, alpha = 1, state and adjoint stab delta=1.0
 
 
+file .py OC-GraetzAdvectionRB_N_9360_mu_6.0_a_0.01 BC2 2.0 ON THE BC 1,5,6
+AdvectionOCGraetzRB_N_9360_mu_6.0_alpha_0.01 = yd nei due rettangolini sopra e sotto nella seconda parte del dominio, mu = 6.0, alpha = 0.01
 
+file .py OC-GraetzAdvectionRB_N_9360_STST_mu_6.0_a_0.01 BC2 ON THE BC 1,5,6
+AdvectionOCGraetzRB_N_9360_STST_mu_6.0_alpha_0.01 = yd nei due rettangolini sopra e sotto nella seconda parte del dominio, mu = 6.0, alpha = 0.01, state stab delta=1.0
+
+file .py OC-GraetzAdvectionRB_N_9360_STSTAD_mu_6.0_a_0.01 BC2 ON THE BC 1,5,6 (PROBLEM!!!!!!!!! ON RB)
+AdvectionOCGraetzRB_N_9360_STSTAD_mu_6.0_alpha_0.01 = yd nei due rettangolini sopra e sotto nella seconda parte del dominio, mu = 6.0, alpha = 0.01, state and adjoint stab delta=1.0
+file .py OC-GraetzAdvectionRB_N_9360_STST_mu_1e5_a_0.1
 
 N = 18798
 

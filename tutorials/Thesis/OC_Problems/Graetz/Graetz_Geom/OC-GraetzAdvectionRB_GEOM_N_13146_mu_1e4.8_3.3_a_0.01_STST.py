@@ -51,7 +51,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Return custom problem name
     def name(self):
-        return "AdvectionOCGraetzRB_GEOM_N_13146_mu_1e4.8_3.3_alpha_0.01"
+        return "AdvectionOCGraetzRB_GEOM_STST_N_13146_mu_1e4.8_3.3_alpha_0.01"
         
         # Return stability factor
     def get_stability_factor_lower_bound(self):
@@ -70,7 +70,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             if self.stabilized:
                 delta = self.delta
                 theta_a5 = delta * 4.0
-                theta_a6 = delta * 4.0
+                theta_a6 = delta * (4.0)/(sqrt(mu[1]))
             else:
                 theta_a5 = 0.0
                 theta_a6 = 0.0
@@ -120,12 +120,15 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             z = self.z
             p = self.p
             vel = self.vel
+            h = self.h
             as0 = inner(grad(z), grad(p)) * dx(1)
             as1 = -vel * p.dx(0) * z * dx(1)
             as2 = - z.dx(0) * p.dx(0) * dx(2)
             as3 = - z.dx(1) * p.dx(1) * dx(2)
             as4 = - vel * z.dx(0) * p * dx(2)
-            return (as0, as1, as2, as3, as4)
+            as5 = Constant(0.0) * - h * vel * p.dx(0) * z.dx(0) * dx(1) #in case, take all the domain
+            as6 = Constant(0.0) * - h * vel * p.dx(0) * z.dx(0) * dx(2) +Constant(0.0) * h * vel * p.dx(0) * z.dx(0) * dx(3) + Constant(0.0) * h * vel * p.dx(0) * z.dx(0) * dx(4)
+            return (as0, as1, as2, as3, as4, as5, as6)
         elif term == "c":
             u = self.u
             q = self.q
@@ -223,7 +226,7 @@ offline_mu = (10**4.8, 3.3) #(1e5, 3.3)
 problem.init()
 problem.set_mu(offline_mu)
 problem.solve()
-problem.export_solution(filename="FEM_OCGraetz_GEOM_N_13146_mu_1e4.8_3.3_alpha_0.01")
+problem.export_solution(filename="FEM_OCGraetz_GEOM_STST_N_13146_mu_1e4.8_3.3_alpha_0.01")
 
 
 # ### 4.4. Prepare reduction with a reduced basis method
@@ -255,7 +258,7 @@ online_mu = (10**4.8, 3.3) #(1e5, 3.3)
 reduced_problem.set_mu(online_mu)
 reduced_solution = reduced_problem.solve(online_stabilization=True)
 print("Reduced output for mu =", online_mu, "is", reduced_problem.compute_output())
-reduced_problem.export_solution(filename="online_solution_OCGraetzGEOM_N_13146_mu_1e4.8_3.3_alpha_0.01")
+reduced_problem.export_solution(filename="online_solution_OCGraetzGEOM_STST_N_13146_mu_1e4.8_3.3_alpha_0.01")
 
 # In[ ]:
 

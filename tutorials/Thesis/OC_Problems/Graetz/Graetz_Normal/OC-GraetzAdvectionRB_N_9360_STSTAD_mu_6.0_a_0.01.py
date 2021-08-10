@@ -58,9 +58,11 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             if self.stabilized:
                 delta = self.delta
                 theta_a2 = delta * 4.0
+                theta_a3 = delta * 4.0
             else:
                 theta_a2 = 0.0
-            return (theta_a0, theta_a1, theta_a2)
+                theta_a3 = 0.0
+            return (theta_a0, theta_a1, theta_a2, theta_a3)
         elif term in ("c", "c*"):
             theta_c0 = 1.0
             return (theta_c0,)
@@ -96,8 +98,9 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             h = self.h
             a0 = inner(grad(y), grad(q)) * dx
             a1 = vel * y.dx(0) * q * dx
-            a2 = h * vel * y.dx(0) * q.dx(0) * dx #in case, take all the domain
-            return (a0, a1, a2)
+            a2 = h * vel * y.dx(0) * q.dx(0) * dx(1)
+            a3 = h * vel * y.dx(0) * q.dx(0) * dx(2)+h * vel * y.dx(0) * q.dx(0) * dx(3)+h * vel * y.dx(0) * q.dx(0) * dx(4)#in case, take all the domain
+            return (a0, a1, a2, a3)
         elif term == "a*":
             z = self.z
             p = self.p
@@ -106,8 +109,9 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             h = self.h
             as0 = inner(grad(z), grad(p)) * dx
             as1 = -vel * p.dx(0) * z * dx
-            as2 = - h * vel * p.dx(0) * z.dx(0) * dx
-            return (as0, as1, as2)
+            as2 = - h * vel * p.dx(0) * z.dx(0) * dx(1)
+            as3 = - h * vel * p.dx(0) * z.dx(0) * dx(2) - h * vel * p.dx(0) * z.dx(0) * dx(3) - h * vel * p.dx(0) * z.dx(0) * dx(4)
+            return (as0, as1, as2, as3)
         elif term == "c":
             u = self.u
             q = self.q
