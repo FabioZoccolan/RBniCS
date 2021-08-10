@@ -2,6 +2,12 @@ GRAETZ
 
 1 EXAMPLE
 
+N = 1143
+file .py: SquareAdvectionRB_NOTSTAB_N_1143
+AdvectionSquareRB_N_1143_NOTSTAB_mu_1e5   N=3211 h=0.0402 mu=1e5 1.0
+file .py: SquareAdvectionRB_N_1143
+AdvectionSquareRB_1_N_1143_STAB_mu_1e5_d_1     N=3211 h=0.0402 mu=1e5 1.0 delta=1
+
 N = 3211
 file .py: SquareAdvectionRB_NOTSTAB_N_3211
 AdvectionSquareRB_N_3211_NOTSTAB_mu_1e5   N=3211 h=0.0402 mu=1e5 1.0
