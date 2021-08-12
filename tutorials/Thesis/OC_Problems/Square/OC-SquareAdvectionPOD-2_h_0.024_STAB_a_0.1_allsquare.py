@@ -6,6 +6,8 @@ from reduction_methods import *
 
 # ### Affine Decomposition
 
+
+
 @OnlineStabilization()
 class EllipticOptimalControl(EllipticOptimalControlProblem):
 
@@ -24,18 +26,15 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         self.dx = Measure("dx")(subdomain_data=subdomains)
         self.ds = Measure("ds")(subdomain_data=boundaries)
         # Regularization coefficient
-        self.alpha = 0.01
+        self.alpha = 0.1
         # Desired state
-        self.y_d = Constant(0.5)
+        self.y_d = Constant(1.0)
+        self.bc1 = Constant(1.0)
         
         self.delta = 2.1
         self.h = CellDiameter(V.mesh())
         
-        self.bc1 = Constant(1.0)
         self.bc2 = Expression("0.0 + 1.0*(x[0] == 0.0)*(x[1] == 0.25)", element=self.V.ufl_element())
-        
-        
-        
         # Customize linear solver parameters
         self._linear_solver_parameters.update({
             "linear_solver": "mumps"
@@ -43,8 +42,8 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Return custom problem name
     def name(self):
-        return "AdvectionOCSquarePOD-1_N_3594_mu_2.4_1.2_alpha_0.01"
-        
+        return "AdvectionOCSquarePOD-2_h_0.024_STAB_mu_2.4_1.2_alpha_0.1_allsquare"
+
     # Return theta multiplicative terms of the affine expansion of the problem.
     def compute_theta(self, term):
         mu = self.mu
@@ -89,24 +88,19 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             theta_f0 = 1.0
             return (theta_f0,)
         elif term == "g":
-            theta_g0 = 0.0
-            theta_g1 = 0.0
-            theta_g2 = 0.0
-            theta_g3 = 1.0
+            theta_g0 = 1.0
             if self.stabilized:
                delta = self.delta
-               theta_g4 = delta * cos(mu[1])
-               theta_g5 = delta * sin(mu[1])
+               theta_g1 = delta * cos(mu[1])
+               theta_g2 = delta * sin(mu[1])
             else:
-               theta_g4 = 0.0
-               theta_g5 = 0.0
-            return (theta_g0, theta_g1, theta_g2, theta_g3, theta_g4, theta_g5)
+               theta_g1 = 0.0
+               theta_g2 = 0.0
+            return (theta_g0, theta_g1, theta_g2)
         elif term == "h":
             theta_h0 = 0.0
-            theta_h1 = 0.0
-            theta_h2 = 0.0
-            theta_h3 = 1.0**2
-            return (theta_h0, theta_h1, theta_h2,  theta_h3)
+            theta_h1 = 1.0**2
+            return (theta_h0, theta_h1)
         elif term == "dirichlet_bc_y":
             theta_bc0 = 1.
             return (theta_bc0,)
@@ -177,20 +171,15 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             z = self.z
             y_d = self.y_d
             h = self.h
-            g0 = y_d * z * dx(1)
-            g1 = y_d * z * dx(2)
-            g2 = y_d * z * dx(3)
-            g3 = y_d * z * dx(4)
-            g4 = - h * y_d * z.dx(0) * dx(4)
-            g5 = - h * y_d * z.dx(1) * dx(4)
-            return (g0, g1, g2, g3, g4, g5)
+            g0 = y_d * z * dx
+            g1 = - h * y_d * z.dx(0) * dx
+            g2 = - h * y_d * z.dx(1) * dx
+            return (g0, g1, g2)
         elif term == "h":
             y_d = self.y_d
             h0 = y_d * y_d * dx(1, domain=mesh)
             h1 = y_d * y_d * dx(2, domain=mesh)
-            h2 = y_d * y_d * dx(3, domain=mesh)
-            h3 = y_d * y_d * dx(4, domain=mesh)
-            return (h0, h1, h2, h3)
+            return (h0, h1)
         elif term == "dirichlet_bc_y":
             bc0 = [DirichletBC(self.V.sub(0), Constant(1.0), self.boundaries, 1),
                    DirichletBC(self.V.sub(0), Constant(0.0), self.boundaries, 2)]
@@ -226,9 +215,9 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 # In[ ]:
 
 
-mesh = Mesh("data/squareOC_N_3594.xml")
-subdomains = MeshFunction("size_t", mesh, "data/squareOC_N_3594_physical_region.xml")
-boundaries = MeshFunction("size_t", mesh, "data/squareOC_N_3594_facet_region.xml")
+mesh = Mesh("data/squareOC_h_0.024.xml")
+subdomains = MeshFunction("size_t", mesh, "data/squareOC_h_0.024_physical_region.xml")
+boundaries = MeshFunction("size_t", mesh, "data/squareOC_h_0.024_facet_region.xml")
 print("hMax: ", mesh.hmax() )
 
 # ### 4.2. Create Finite Element space (Lagrange P1)
@@ -242,18 +231,17 @@ print("Dim: ", V.dim() )
 
 
 problem = EllipticOptimalControl(V, subdomains=subdomains, boundaries=boundaries)
-mu_range = [(1e4,5e5), (0.01, 6.3)]
+mu_range = [(1e4,5e5), (0.0, 6.3)]
 problem.set_mu_range(mu_range)
 
 offline_mu = (2e4, 1.2)
 problem.init()
 problem.set_mu(offline_mu)
 problem.solve()
-problem.export_solution(filename="FEM_OC_Square_N_3594_mu_2.4_1.2_alpha_0.01")
+problem.export_solution(filename="FEM_OC_Square2_h_0.024_STAB_mu_2.4_1.2_alpha_0.1_allsquare")
 
 
-
-# ### 4.4. Prepare reduction with a reduced basis method
+## ### 4.4. Prepare reduction with a reduced basis method
 
 # In[ ]:
 
@@ -279,7 +267,8 @@ online_mu = (2e4, 1.2)
 reduced_elliptic_optimal_control.set_mu(online_mu)
 reduced_solution = reduced_elliptic_optimal_control.solve()
 print("Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
-reduced_elliptic_optimal_control.export_solution(filename="online_solution_OC_Square_N_3594_mu_2.4_1.2_alpha_0.01")
+reduced_elliptic_optimal_control.export_solution(filename="FEM_OC_Square2_h_0.024_STAB_mu_2.4_1.2_alpha_0.1_allsquare")
+
 # ### 4.7. Perform an error analysis
 
 # In[ ]:
@@ -294,10 +283,4 @@ pod_galerkin_method.error_analysis()
 # In[ ]:
 
 pod_galerkin_method.speedup_analysis()
-
-
-
-
-
-
 
