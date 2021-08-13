@@ -44,7 +44,7 @@ class AdvectionDominated(EllipticCoerciveProblem):
         
     # Return custom problem name
     def name(self):
-        return "AdvectionPODGraetz-GEOM_NOSTAB_mu_1e4.8_3.3_d_1.1"
+        return "AdvectionPODGraetz-GEOM_NOSTAB_mu_1e4.8_3.3"
 
     # Return theta multiplicative terms of the affine expansion of the problem.
     @compute_theta_for_stability_factor
@@ -138,7 +138,7 @@ offline_mu = (10**4.8, 3.3)
 
 advection_dominated_problem.set_mu(offline_mu)
 advection_dominated_problem.solve()
-advection_dominated_problem.export_solution(filename="FEM_GEOM_NOSTAB_mu_1e4.8_3.3_d_1.1_offline_solution")
+advection_dominated_problem.export_solution(filename="FEM_GEOM_NOSTAB_mu_1e4.8_3.3_offline_solution")
 
 reduction_method = PODGalerkin(advection_dominated_problem)
 reduction_method.set_Nmax(50)
@@ -154,18 +154,18 @@ reduced_problem = reduction_method.offline()
 online_mu = (10**4.8, 3.3)
 reduced_problem.set_mu(online_mu)
 reduced_problem.solve(online_stabilization=True)
-reduced_problem.export_solution(filename="online_solution_GEOM_NOSTAB_mu_1e4.8_3.3_d_1.1_with_stabilization")
+reduced_problem.export_solution(filename="online_solution_GEOM_NOSTAB_mu_1e4.8_3.3_with_stabilization")
 reduced_problem.solve(online_stabilization=False)
-reduced_problem.export_solution(filename="online_solution_GEOM_NOSTAB_mu_1e4.8_3.3_d_1.1_without_stabilization")
+reduced_problem.export_solution(filename="online_solution_GEOM_NOSTAB_mu_1e4.8_3.3_without_stabilization")
 
 # 7. Perform an error analysis
 reduction_method.initialize_testing_set(100)
-reduction_method.error_analysis(online_stabilization=True, filename="error_analysis_GEOM_STAB_mu_1e4.8_3.3_d_1.1_with_stabilization")
-reduction_method.error_analysis(online_stabilization=False, filename="error_analysis_GEOM_STAB_mu_1e4.8_3.3_d_1.1_without_stabilization")
+reduction_method.error_analysis(online_stabilization=True, filename="error_analysis_GEOM_STAB_mu_1e4.8_3.3_with_stabilization")
+reduction_method.error_analysis(online_stabilization=False, filename="error_analysis_GEOM_STAB_mu_1e4.8_3.3_without_stabilization")
 
 # 8. Perform a speedup analysis
-reduction_method.speedup_analysis(online_stabilization=True, filename="speedup_analysis_GEOM_NOSTAB_mu_1e4.8_3.3_d_1.1_with_stabilization")
-reduction_method.speedup_analysis(online_stabilization=False, filename="speedup_analysis_GEOM_NOSTAB_mu_1e4.8_3.3_d_1.1_without_stabilization")
+reduction_method.speedup_analysis(online_stabilization=True, filename="speedup_analysis_GEOM_NOSTAB_mu_1e4.8_3.3_with_stabilization")
+reduction_method.speedup_analysis(online_stabilization=False, filename="speedup_analysis_GEOM_NOSTAB_mu_1e4.8_3.3_without_stabilization")
 
 """
 # 1. Read the mesh for this problem

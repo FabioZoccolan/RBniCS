@@ -42,7 +42,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Return custom problem name
     def name(self):
-        return "AdvectionOCSquarePOD-2_h_0.049_STAB_mu_2.4_1.2_alpha_0.1_allsquare"
+        return "AdvectionOCSquarePOD2_h_0.049_STAB_mu_2.4_1.2_alpha_0.1_allsquare"
 
     # Return theta multiplicative terms of the affine expansion of the problem.
     def compute_theta(self, term):

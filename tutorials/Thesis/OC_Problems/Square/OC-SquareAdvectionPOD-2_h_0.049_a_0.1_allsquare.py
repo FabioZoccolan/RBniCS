@@ -38,7 +38,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Return custom problem name
     def name(self):
-        return "AdvectionOCSquarePOD-2_h_0.049_mu_2.4_1.2_alpha_0.1_allsquare"
+        return "AdvectionOCSquarePOD2_h_0.049_mu_2.4_1.2_alpha_0.1_allsquare"
 
 
     # Return theta multiplicative terms of the affine expansion of the problem.
@@ -186,7 +186,7 @@ offline_mu = (2e4, 1.2)
 problem.init()
 problem.set_mu(offline_mu)
 problem.solve()
-problem.export_solution(filename="FEM_OC_Square_h_0.049_mu_2.4_1.2_alpha_0.1_allsquare")
+problem.export_solution(filename="FEM_OC_Square2_h_0.049_mu_2.4_1.2_alpha_0.1_allsquare")
 
 
 ## ### 4.4. Prepare reduction with a reduced basis method
@@ -215,7 +215,7 @@ online_mu = (2e4, 1.2)
 reduced_elliptic_optimal_control.set_mu(online_mu)
 reduced_solution = reduced_elliptic_optimal_control.solve()
 print("Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
-reduced_elliptic_optimal_control.export_solution(filename="FEM_OC_Square_h_0.049_mu_2.4_1.2_alpha_0.1_allsquare")
+reduced_elliptic_optimal_control.export_solution(filename="FEM_OC_Square2_h_0.049_mu_2.4_1.2_alpha_0.1_allsquare")
 
 # ### 4.7. Perform an error analysis
 

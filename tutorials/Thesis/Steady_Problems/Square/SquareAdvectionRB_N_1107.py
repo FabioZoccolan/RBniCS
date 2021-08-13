@@ -62,20 +62,8 @@ class AdvectionDominated(EllipticCoerciveProblem):
                 theta_a5 = 0.0
             return (theta_a0, theta_a1, theta_a2, theta_a3, theta_a4, theta_a5)
         elif term == "f":
-            theta_f0 = 0.0 #- 1/(mu[0])
-            theta_f1 = 0.0 #-cos(mu[1])
-            theta_f2 = 0.0 #-sin(mu[1])
-            
-            if self.stabilized:
-                delta = self.delta
-                theta_f3 = 0.0 #- delta * cos(mu[1])**2
-                theta_f4 = 0.0 #- delta * cos(mu[1]) * sin(mu[1])
-                theta_f5 = 0.0 #- delta * sin(mu[1])**2
-            else:
-                theta_f3 = 0.0
-                theta_f4 = 0.0
-                theta_f5 = 0.0
-            return (theta_f0, theta_f1, theta_f2, theta_f3, theta_f4, theta_f5)
+            theta_f0 = 0.0 
+            return (theta_f0,)
         elif term == "dirichlet_bc":
             theta_bc0 = 1.0
             return (theta_bc0,)
@@ -83,7 +71,7 @@ class AdvectionDominated(EllipticCoerciveProblem):
             raise ValueError("Invalid term for compute_theta().")
 
 
-    ##########METTERE H NELLE FORME DI A, DA a3 in giù
+    
     # Return forms resulting from the discretization of the affine expansion of the problem operators.
     def assemble_operator(self, term):
         v = self.v
@@ -92,24 +80,17 @@ class AdvectionDominated(EllipticCoerciveProblem):
         if term == "a":
             u = self.u
             h = self.h
-            a0 = inner(grad(u), grad(v)) * dx #+ 1e-15*u*v*dx #- inner(grad(l), grad(v)) * dx
-            a1 = u.dx(0) * v * dx  #+ 1e-15*u*v*dx #- l.dx(0) * v * dx
-            a2 = u.dx(1) * v * dx #+ 1e-15*u*v*dx#- l.dx(1) * v * dx
-            a3 = h * u.dx(0) * v.dx(0) * dx #+ 1e-15*u*v*dx #- h * l.dx(0) * v.dx(0) * dx
-            a4 = h * u.dx(0) * v.dx(1) * dx + h * u.dx(1) * v.dx(0) * dx #+ 1e-15*u*v*dx#- h * l.dx(0) * v.dx(1) * dx + h * l.dx(1) * v.dx(0) * dx
-            a5 = h * u.dx(1) * v.dx(1) * dx #+ 1e-15*u*v*dx# - h * l.dx(1) * v.dx(1) * dx 
+            a0 = inner(grad(u), grad(v)) * dx 
+            a1 = u.dx(0) * v * dx 
+            a2 = u.dx(1) * v * dx 
+            a3 = h * u.dx(0) * v.dx(0) * dx
+            a4 = h * u.dx(0) * v.dx(1) * dx + h * u.dx(1) * v.dx(0) * dx
+            a5 = h * u.dx(1) * v.dx(1) * dx 
             return (a0, a1, a2, a3, a4, a5)
         elif term == "f":
-            u = self.u
-            l = self.lifting
-            h = self.h
-            f0 = inner(grad(l), grad(v)) * dx
-            f1 = l.dx(0) * v * dx # + 1e-15*l*v*dx
-            f2 = l.dx(1) * v * dx 
-            f3 = h * l.dx(0) * v.dx(0) * dx 
-            f4 = h * l.dx(0) * v.dx(1) * dx + h * l.dx(1) * v.dx(0) * dx 
-            f5 = h * l.dx(1) * v.dx(1) * dx 
-            return (f0, f1, f2, f3, f4, f5)
+            f = self.f
+            f0 = f*v dx
+            return (f0,)
         elif term == "dirichlet_bc":
             bc0 = [DirichletBC(self.V, self.bc1, self.boundaries, 1),
                    DirichletBC(self.V, self.bc2, self.boundaries, 2)]
@@ -137,12 +118,13 @@ problem = AdvectionDominated(V, subdomains=subdomains, boundaries=boundaries)
 mu_range = [(1e4, 5e5), (0.0, 6.3)]
 problem.set_mu_range(mu_range)
 
+###Offline solution
 offline_mu = (2e4, 1.2)
 problem.set_mu(offline_mu)
 problem.init()
 
 problem.solve()
-problem.export_solution(filename="FEM_adsquare_STAB_N_1107_mu_2e4_1.2_d_2.1") #_with_stabilization
+problem.export_solution(filename="FEM_adsquare_STAB_N_1107_mu_2e4_1.2_d_2.1") 
 
 
 

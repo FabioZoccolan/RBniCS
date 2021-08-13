@@ -14,7 +14,7 @@ from reduction_methods import *
 
 
 @PullBackFormsToReferenceDomain()
-@ShapeParametrization(
+#@ShapeParametrization(
     ("x[0]", "x[1]"), # subdomain 1
     ("mu[1]*(x[0] - 1) + 1", "x[1]"), # subdomain 2
 )
@@ -44,7 +44,7 @@ class AdvectionDominated(EllipticCoerciveProblem):
         
     # Return custom problem name
     def name(self):
-        return "AdvectionRBGraetz-GEOM_STAB_mu_1e4.8_3.3_d_1.1"
+        return "AdvectionRBGraetz-GEOM_STAB_mu_1e4.8_3.3_d_1.0"
     
      # Return stability factor
     def get_stability_factor_lower_bound(self):
@@ -72,7 +72,7 @@ class AdvectionDominated(EllipticCoerciveProblem):
             theta_f0 = 0.0
             if self.stabilized:
                 delta = self.delta
-                theta_f1 = delta
+                theta_f1 = 0.0 #delta
             else:
                 theta_f1 = 0.0
             return (theta_f0, theta_f1)
@@ -142,7 +142,7 @@ offline_mu = (10**4.8, 3.3)
 
 advection_dominated_problem.set_mu(offline_mu)
 advection_dominated_problem.solve()
-advection_dominated_problem.export_solution(filename="FEM_GEOM_STAB_mu_1e4.8_3.3_d_1.1_offline_solution")
+advection_dominated_problem.export_solution(filename="FEM_GEOM_STAB_mu_1e4.8_3.3_d_1.0_offline_solution")
 
 # 4. Prepare reduction with a reduced basis method
 reduction_method = PODGalerkin(advection_dominated_problem)
@@ -159,18 +159,18 @@ reduced_problem = reduction_method.offline()
 online_mu = (10**4.8, 3.3)
 reduced_problem.set_mu(online_mu)
 reduced_problem.solve(online_stabilization=True)
-reduced_problem.export_solution(filename="online_solution_GEOM_STAB_mu_1e4.8_3.3_d_1.1_with_stabilization")
+reduced_problem.export_solution(filename="online_solution_GEOM_STAB_mu_1e4.8_3.3_d_1.0_with_stabilization")
 reduced_problem.solve(online_stabilization=False)
-reduced_problem.export_solution(filename="online_solution_GEOM_STAB_mu_1e4.8_3.3_d_1.1_without_stabilization")
+reduced_problem.export_solution(filename="online_solution_GEOM_STAB_mu_1e4.8_3.3_d_1.0_without_stabilization")
 
 # 7. Perform an error analysis
 reduction_method.initialize_testing_set(100)
-reduction_method.error_analysis(online_stabilization=True, filename="error_analysis_GEOM_STAB_mu_1e4.8_3.3_d_1.1_with_stabilization")
-reduction_method.error_analysis(online_stabilization=False, filename="error_analysis_GEOM_STAB_mu_1e4.8_3.3_d_1.1_without_stabilization")
+reduction_method.error_analysis(online_stabilization=True, filename="error_analysis_GEOM_STAB_mu_1e4.8_3.3_d_1.0_with_stabilization")
+reduction_method.error_analysis(online_stabilization=False, filename="error_analysis_GEOM_STAB_mu_1e4.8_3.3_d_1.0_without_stabilization")
 
 # 8. Perform a speedup analysis
-reduction_method.speedup_analysis(online_stabilization=True, filename="speedup_analysis_GEOM_STAB_mu_1e4.8_3.3_d_1.1_with_stabilization")
-reduction_method.speedup_analysis(online_stabilization=False, filename="speedup_analysis_GEOM_STAB_mu_1e4.8_3.3_d_1.1_without_stabilization")
+reduction_method.speedup_analysis(online_stabilization=True, filename="speedup_analysis_GEOM_STAB_mu_1e4.8_3.3_d_1.0_with_stabilization")
+reduction_method.speedup_analysis(online_stabilization=False, filename="speedup_analysis_GEOM_STAB_mu_1e4.8_3.3_d_1.0_without_stabilization")
 
 """
 # 1. Read the mesh for this problem

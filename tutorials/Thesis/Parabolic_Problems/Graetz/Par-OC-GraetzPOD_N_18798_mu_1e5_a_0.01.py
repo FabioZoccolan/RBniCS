@@ -223,7 +223,7 @@ boundaries = MeshFunction("size_t", mesh, "data/graetzOC_N_18798_facet_region.xm
 print("hMax: ", mesh.hmax() )
 
 # 2 Create Finite Element space (Lagrange P1)
-T = 1.0
+T = 3.0
 dt = 0.5
 Nt = int(ceil(T/dt))
 

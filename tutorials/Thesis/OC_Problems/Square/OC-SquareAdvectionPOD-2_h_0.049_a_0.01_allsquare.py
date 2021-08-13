@@ -38,7 +38,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Return custom problem name
     def name(self):
-        return "AdvectionOCSquarePOD-2_h_0.049_mu_2.4_1.2_alpha_0.01_allsquare"
+        return "AdvectionOCSquarePOD2_h_0.049_mu_2.4_1.2_alpha_0.01_allsquare"
 
     # Return theta multiplicative terms of the affine expansion of the problem.
     def compute_theta(self, term):
@@ -81,16 +81,16 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         if term == "a":
             y = self.y
             q = self.q
-            a0 = inner(grad(y), grad(q)) * dx #- inner(grad(l), grad(v)) * dx
-            a1 = y.dx(0) * q * dx #- l.dx(0) * v * dx
-            a2 = y.dx(1) * q * dx #- l.dx(1) * v * dx
+            a0 = inner(grad(y), grad(q)) * dx 
+            a1 = y.dx(0) * q * dx 
+            a2 = y.dx(1) * q * dx 
             return (a0,a1,a2)
         elif term == "a*":
             z = self.z
             p = self.p
             as0 = inner(grad(z), grad(p)) * dx
-            as1 = - p.dx(0) * z * dx #- l.dx(0) * v * dx
-            as2 = - p.dx(1) * z * dx #- l.dx(1) * v * dx
+            as1 = - p.dx(0) * z * dx 
+            as2 = - p.dx(1) * z * dx
             return (as0,as1,as2)
         elif term == "c":
             u = self.u
@@ -185,7 +185,7 @@ offline_mu = (2e4, 1.2)
 problem.init()
 problem.set_mu(offline_mu)
 problem.solve()
-problem.export_solution(filename="FEM_OC_Square_h_0.049_mu_2.4_1.2_alpha_0.01_allsquare")
+problem.export_solution(filename="FEM_OC_Square2_h_0.049_mu_2.4_1.2_alpha_0.01_allsquare")
 
 
 # ### 4.4. Prepare reduction with a reduced basis method
@@ -214,7 +214,7 @@ online_mu = (2e4, 1.2)
 reduced_elliptic_optimal_control.set_mu(online_mu)
 reduced_solution = reduced_elliptic_optimal_control.solve()
 print("Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
-reduced_elliptic_optimal_control.export_solution(filename="FEM_OC_Square_h_0.049_mu_2.4_1.2_alpha_0.01_allsquare")
+reduced_elliptic_optimal_control.export_solution(filename="FEM_OC_Square2_h_0.049_mu_2.4_1.2_alpha_0.01_allsquare")
 
 # ### 4.7. Perform an error analysis
 

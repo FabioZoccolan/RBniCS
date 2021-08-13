@@ -30,6 +30,7 @@ class AdvectionDominated(EllipticCoerciveProblem):
         self.vel = Expression("x[1]*(1-x[1])", element=self.V.ufl_element())
         self.f = Constant(0.0)
         self.lifting = Expression('1.', degree=1, domain=mesh) #Expression('((x[0] >= 1 && x[0] <= 2) && (x[1] == 1.0 || x[1]== 0.0) ) ? 1. : 0.', degree=1, domain=mesh)
+        
         # Store terms related to stabilization
         self.delta = 1.0
         self.h = CellDiameter(V.mesh())
