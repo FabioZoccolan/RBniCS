@@ -1,0 +1,57 @@
+OC GRAETZ - GEOMETRICAL PARAMETRIZATION
+
+
+ALL FILES USE POD-GALERKIN, NOT RB
+
+
+OC-GRAETZADVECTIONPOD1 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, yd = 0 in tutto il resto del dominio) BC2= 0.0 ON 1,5,6
+
+N = 13146 (dim FEM) h = 0.034 (max diam mesh)
+
+
+file .py OC-GraetzAdvectionPOD1_h_0.034_mu_1e4.8_3.3_a_0.1
+AdvectionOCGraetzPOD1_h_0.034_mu_1e4.8_3.3_alpha_0.01 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, yd = 0 in tutto il resto del dominio), mu = (1e4.8, 3.3), alpha = 0.1
+
+file .py OC-GraetzAdvectionPOD1_h_0.034_mu_1e4.8_3.3_a_0.01
+AdvectionOCGraetzPOD1_h_0.034_mu_1e4.8_3.3_alpha_0.01 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, yd = 0 in tutto il resto del dominio), mu = (1e4.8, 3.3), alpha = 0.01
+
+file .py OC-GraetzAdvectionPOD1_h_0.034_mu_1e4.8_3.3_STAB_a_0.1
+AdvectionOCGraetzPOD1_h_0.034_mu_1e4.8_3.3_alpha_0.01 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, yd = 0 in tutto il resto del dominio), mu = (1e4.8, 3.3), alpha = 0.01, state and adjoint stable, delta = 1.0
+
+file .py OC-GraetzAdvectionPOD1_h_0.034_mu_1e4.8_3.3_STAB_a_0.01
+AdvectionOCGraetzPOD1_h_0.034_mu_1e4.8_3.3_alpha_0.01 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, yd = 0 in tutto il resto del dominio), mu = (1e4.8, 3.3), alpha = 0.01, state and adjoint stable, delta = 1.0
+
+
+N = 37428 (dim FEM) h = 0.020 (max diam mesh)
+
+file .py OC-GraetzAdvectionPOD1_h_0.020_mu_1e4.8_1.8_STAB_a_0.01 (	NON BELLISSIMO SUL LATO SINISTRO COME IMMAGINE)
+AdvectionOCGraetzPOD1_h_0.020_mu_1e4.8_1.8_alpha_0.01 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, yd = 0 in tutto il resto del dominio), mu = (1e4.8, 1.8), alpha = 0.01, state and adjoint stable, delta = 1.0
+
+
+file .py OC-GraetzAdvectionPOD1_h_0.020_mu_1e4.8_3.3_a_0.01
+AdvectionOCGraetzPOD1_h_0.020_mu_1e4.8_3.3_alpha_0.01 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, yd = 0 in tutto il resto del dominio), mu = (1e4.8, 3.3), alpha = 0.01
+
+file .py OC-GraetzAdvectionPOD1_h_0.020_mu_1e4.8_3.3_STAB_a_0.01
+AdvectionOCGraetzPOD1_h_0.020_mu_1e4.8_3.3_alpha_0.01 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, yd = 0 in tutto il resto del dominio), mu = (1e4.8, 3.3), alpha = 0.01, state and adjoint stable, delta = 1.0
+
+
+
+
+OC-GRAETZADVECTIONPOD2 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, tutto il resto del dominio libero) BC2 = 2.0 ON 1,5,6 
+
+N = 13146 (dim FEM) h = 0.034 (max diam mesh)
+
+file .py OC-GraetzAdvectionPOD2_h_0.034_mu_1e4.8_3.3_a_0.01
+AdvectionOCGraetzPOD1_h_0.034_mu_1e4.8_3.3_alpha_0.01 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, yd = 0 in tutto il resto del dominio), mu = (1e4.8, 3.3), alpha = 0.01
+
+file .py OC-GraetzAdvectionPOD2_h_0.034_mu_1e4.8_3.3_STAB_a_0.01
+AdvectionOCGraetzPOD1_h_0.034_mu_1e4.8_3.3_alpha_0.01 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, yd = 0 in tutto il resto del dominio), mu = (1e4.8, 3.3), alpha = 0.01, state and adjoint stable, delta = 1.0
+
+N = 37428 (dim FEM) h = 0.020 (max diam mesh)
+
+file .py OC-GraetzAdvectionPOD2_h_0.020_mu_1e4.8_3.3_a_0.01
+AdvectionOCGraetzPOD1_h_0.020_mu_1e4.8_3.3_alpha_0.01 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, yd = 0 in tutto il resto del dominio), mu = (1e4.8, 3.3), alpha = 0.01
+
+file .py OC-GraetzAdvectionPOD2_h_0.020_mu_1e4.8_3.3_STAB_a_0.01
+AdvectionOCGraetzPOD1_h_0.020_mu_1e4.8_3.3_alpha_0.01 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, yd = 0 in tutto il resto del dominio), mu = (1e4.8, 3.3), alpha = 0.01, state and adjoint stable, delta = 1.0
+

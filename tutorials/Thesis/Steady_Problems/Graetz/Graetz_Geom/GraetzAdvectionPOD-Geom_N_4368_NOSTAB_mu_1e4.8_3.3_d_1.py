@@ -13,7 +13,7 @@ from reduction_methods import *
 ###AGGIUNGERE IN CASO GEOMETRIA DOPO
 
 
-@PullBackFormsToReferenceDomain()
+#@PullBackFormsToReferenceDomain()
 @ShapeParametrization(
     ("x[0]", "x[1]"), # subdomain 1
     ("mu[1]*(x[0] - 1) + 1", "x[1]"), # subdomain 2
@@ -55,7 +55,7 @@ class AdvectionDominated(EllipticCoerciveProblem):
             theta_a1 = 4.0
             theta_a2 = 1/(mu[0]*mu[1])
             theta_a3 = (mu[1])/(mu[0])
-            theta_a4 = 4.0*mu[1]
+            theta_a4 = 4.0
             if self.stabilized:
                 delta = self.delta
                 theta_a5 = 0.0 #delta * 4.0

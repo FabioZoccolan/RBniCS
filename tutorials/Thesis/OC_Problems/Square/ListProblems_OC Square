@@ -1,0 +1,87 @@
+OC SQUARE
+
+All files use PODGalerkin
+TUTTI i file hanno mu = (2e4,1.2)
+
+OC-SquareAdvectionPOD-1 = (yd = 1 nel rettangolo (0.25,0.75) x (1.0,1.0), 0 altrimenti
+
+N = 12087 (dim FEM), h = 0.025 (max diam mesh)
+
+file .py OC-SquareAdvectionPOD-1_h_0.025_a_1 : alpha = 1
+
+file .py OC-SquareAdvectionPOD-1_h_0.025_STAB_a_1 : alpha = 1, state and adjoint stab delta= 2.1
+
+file .py OC-SquareAdvectionPOD-1_h_0.025_a_0.1 : alpha = 0.1
+
+file .py OC-SquareAdvectionPOD-1_h_0.025_STAB_a_0.1 : alpha = 0.1, state and adjoint stab delta= 2.1
+
+file .py OC-SquareAdvectionPOD-1_h_0.025_a_0.01 : alpha = 0.01
+
+
+file .py OC-SquareAdvectionPOD-1_h_0.025_STAB_a_0.01 : alpha = 0.01, state and adjoint stab delta= 2.1
+
+
+
+N = 3594 (dim FEM), h = 0.047 (max diam mesh)
+
+
+file .py OC-SquareAdvectionPOD-1_h_0.047_a_0.01 : alpha = 0.01
+
+
+file .py OC-SquareAdvectionPOD-1_h_0.047_STAB_a_0.01 : alpha = 0.01, state and adjoint stab delta= 2.1
+
+
+
+
+OC-SquareAdvectionPOD-2 = (yd = 1 su tutto il quadrato)
+
+N = 13956 (dim FEM), h = 0.024 (max diam mesh)
+
+file .py OC-SquareAdvectionPOD-2_h_0.024_a_0.01 : alpha = 0.01
+
+
+file .py OC-SquareAdvectionPOD-2_h_0.024_STAB_a_0.01 : alpha = 0.01, state and adjoint stab delta= 2.1
+
+file .py OC-SquareAdvectionPOD-2_h_0.024_a_0.1 : alpha = 0.1
+
+
+file .py OC-SquareAdvectionPOD-2_h_0.024_STAB_a_0.1 : alpha = 0.1, state and adjoint stab delta= 2.1
+
+
+file .py OC-SquareAdvectionPOD-2_h_0.024_a_1 : alpha = 1
+
+file .py OC-SquareAdvectionPOD-2_h_0.024_STAB_a_1 : alpha = 1, state and adjoint stab delta= 2.1
+
+
+
+N = 3321 (dim FEM), h = 0.049 (max diam mesh)
+file .py OC-SquareAdvectionPOD-2_h_0.049_a_0.01 : alpha = 0.01
+
+
+file .py OC-SquareAdvectionPOD-2_h_0.049_STAB_a_0.01 : alpha = 0.01, state and adjoint stab delta= 2.1
+
+file .py OC-SquareAdvectionPOD-2_h_0.049_a_0.1 : alpha = 0.1
+
+
+file .py OC-SquareAdvectionPOD-2_h_0.049_STAB_a_0.1 : alpha = 0.1, state and adjoint stab delta= 2.1
+
+
+file .py OC-SquareAdvectionPOD-2_h_0.049_a_1 : alpha = 1
+
+file .py OC-SquareAdvectionPOD-2_h_0.049_STAB_a_1 : alpha = 1, state and adjoint stab delta= 2.1
+
+
+
+
+OC-SquareAdvectionPOD-3 = (yd = 1 nel rettangolo (0.25,0.75) x (1.0,1.0), libero altrimenti)
+
+N = 12087 (dim FEM), h = 0.025 (max diam mesh)
+
+file .py OC-SquareAdvectionPOD-3_h_0.025_a_0.1 : alpha = 0.1
+
+file .py OC-SquareAdvectionPOD-3_h_0.025_STAB_a_0.1 : alpha = 0.1, state and adjoint stab delta= 2.1
+
+file .py OC-SquareAdvectionPOD-3_h_0.025_a_0.01 : alpha = 0.01
+
+
+file .py OC-SquareAdvectionPOD-3_h_0.025_STAB_a_0.01 : alpha = 0.01, state and adjoint stab delta= 2.1

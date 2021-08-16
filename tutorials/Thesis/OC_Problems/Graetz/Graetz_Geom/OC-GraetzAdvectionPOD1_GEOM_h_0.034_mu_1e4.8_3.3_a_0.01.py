@@ -7,7 +7,7 @@ from reduction_methods import *
 
 For this problem the affine decomposition is straightforward.
 """
-@PullBackFormsToReferenceDomain()
+#@PullBackFormsToReferenceDomain()
 @ShapeParametrization(
     ("x[0]", "x[1]"), # subdomain 1
     ("mu[1]*(x[0] - 1) + 1", "x[1]"), # subdomain 2
@@ -53,7 +53,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             theta_a1 = 4.0
             theta_a2 = 1/(mu[0]*mu[1])
             theta_a3 = (mu[1])/(mu[0])
-            theta_a4 = 4.0*mu[1]
+            theta_a4 = 4.0
             return (theta_a0, theta_a1, theta_a2, theta_a3, theta_a4)
         elif term in ("c", "c*"):
             theta_c0 = 1.0
@@ -101,7 +101,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             as1 = -vel * p.dx(0) * z * dx(1)
             as2 = - z.dx(0) * p.dx(0) * dx(2)
             as3 = - z.dx(1) * p.dx(1) * dx(2)
-            as4 = - vel * z.dx(0) * p * dx(2)
+            as4 = - vel * p.dx(0) * z * dx(2)
             return (as0, as1, as2, as3, as4)
         elif term == "c":
             u = self.u

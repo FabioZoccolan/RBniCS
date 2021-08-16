@@ -10,6 +10,7 @@ from numpy import ceil, zeros, isclose
 For this problem the affine decomposition is straightforward.
 """
 
+@OnlineStabilization()
 class AdvectionDominated(EllipticCoerciveProblem):
 
     # Default initialization of members
@@ -30,9 +31,11 @@ class AdvectionDominated(EllipticCoerciveProblem):
         # Regularization coefficient
         # Store the velocity expression
         self.vel = Expression("x[1] * (1 - x[1])", degree=2, domain=mesh)
-        #self.lifting = Expression('((x[0] >= 1 && x[0] <= 2) && (x[1] == 1.0 || x[1]== 0.0) ) ? 1. : 0.', degree=1, domain=mesh)
         
-        self.f_0 =Constant(1.0)
+        self.delta = 1.0
+        
+        self.h = CellDiameter(block_V.mesh())
+        self.y_0 = Expression(("1*(x[0] == 0)"), degree=2, domain=mesh)
         
         # Customize linear solver parameters
         self._linear_solver_parameters.update({
@@ -49,7 +52,15 @@ class AdvectionDominated(EllipticCoerciveProblem):
         if term in ("a", "a*"):
             theta_a0 = 1/(mu[0])
             theta_a1 = 4.0
-            return (theta_a0, theta_a1)
+            if self.stabilized:
+                delta = self.delta
+                theta_a2 = delta * 4.0
+                theta_a3 = delta * 4.0
+            else:
+                theta_a2 = 0.0
+                theta_a3 = 0.0
+            theta_a4 = 1.0
+            return (theta_a0, theta_a1, theta_a2, theta_a3, theta_a4)
         elif term == "f":
             theta_f0 = 1.0
             return (theta_f0, )
@@ -66,39 +77,47 @@ class AdvectionDominated(EllipticCoerciveProblem):
         v = self.v
         if term == "a":
             u = self.u
+            h = self.h
             vel = self.vel
             a0_0 = zeros((Nt, Nt), dtype=object)
             a1_0 = zeros((Nt, Nt), dtype=object)
+            a2_0 = zeros((Nt, Nt), dtype=object)
+            a3_0 = zeros((Nt, Nt), dtype=object)
+            m_0 = zeros((Nt, Nt), dtype=object)
             for i in range(Nt):
                 a0_0[i, i] = dt*inner(grad(u[i]), grad(v[i]))*dx #a0 = inner(grad(y), grad(q)) * dx   
                 
-                a1_0[i, i] =  inner(u[i],v[i])*dx + dt*vel*u[i].dx(0)*v[i]*dx #a1 = vel * y.dx(0) * q * dx
-                
+                a1_0[i, i] = + dt*vel*u[i].dx(0)*v[i]*dx #a1 = vel * y.dx(0) * q * dx
+                a2_0[i, i] = dt * h * vel * u[i].dx(0) * v[i].dx(0) * dx(1) 
+                a3_0[i, i] =  dt * h * vel * u[i].dx(0) * v[i].dx(0) * dx(2) + dt * h * vel * u[i].dx(0) * v[i].dx(0) * dx(3) + dt * h * vel * u[i].dx(0) * v[i].dx(0) * dx(4) 
+                m_0[i,i] = inner(u[i],v[i])*dx
             for i in range(Nt-1):
-                a1_0[i+1,i] = - inner(u[i], v[i+1])*dx
+                m_0[i+1,i] = - inner(u[i], v[i+1])*dx
             a0 = [[0, 0, 0], [0, 0, 0], [a0_0, 0, 0]]
             a1 = [[0, 0, 0], [0, 0, 0], [a1_0, 0, 0]]
-            return (BlockForm(a0), BlockForm(a1))
+            a2 = [[0, 0, 0], [0, 0, 0], [a2_0, 0, 0]]
+            a3 = [[0, 0, 0], [0, 0, 0], [a3_0, 0, 0]]
+            a4 = [[0, 0, 0], [0, 0, 0], [m_0, 0, 0]]
+            return (BlockForm(a0), BlockForm(a1), BlockForm(a2), BlockForm(a3), BlockForm(a4))
         elif term == "f":
-            f_0 = self.f_0
+            y_0 = self.y_0
             f0_0 = zeros(Nt, dtype=object)
-            f0_0[0] = inner(f_0, v[0])*dx #inner(Constant(0.0), q[0])*dx 
-            f0 = [0, 0, f0_0] #CONTROLLAREEEEEEEEEEEEEE
+            f0_0[0] = inner(y_0, v[0])*dx 
+            f0 = [0, 0, f0_0] 
             return (BlockForm(f0),)
         elif term == "dirichlet_bc_y":
-            bc0 = BlockDirichletBC([[[DirichletBC(block_V.sub(i), Constant(0.0), self.boundaries, 1),
-                   DirichletBC(block_V.sub(i), Constant(1.0), self.boundaries, 2),
-                   DirichletBC(block_V.sub(i), Constant(1.0), self.boundaries, 4),
-                   DirichletBC(block_V.sub(i), Constant(0.0), self.boundaries, 5),
-                   DirichletBC(block_V.sub(i), Constant(0.0), self.boundaries, 6)] for i in range(0, Nt)], None, None])
+            bc0 = BlockDirichletBC(  [[DirichletBC(block_V.sub(i), Constant(0.0), self.boundaries, 1) for i in range(0, Nt)], None, None],
+                                     [[DirichletBC(block_V.sub(i), Constant(1.0), self.boundaries, 2) for i in range(0, Nt)], None, None],
+                                     [[DirichletBC(block_V.sub(i), Constant(1.0), self.boundaries, 4) for i in range(0, Nt)], None, None],
+                                     [[DirichletBC(block_V.sub(i), Constant(0.0), self.boundaries, 5) for i in range(0, Nt)], None, None],
+                                     [[DirichletBC(block_V.sub(i), Constant(0.0), self.boundaries, 6) for i in range(0, Nt)], None, None] )
             return (bc0,)
         elif term == "dirichlet_bc_p":
-            bc0 = BlockDirichletBC([None, None, [[DirichletBC(block_V.sub(i), Constant(0.0), self.boundaries, 1),
-                   DirichletBC(block_V.sub(i), Constant(0.0), self.boundaries, 2),
-                   DirichletBC(block_V.sub(i), Constant(0.0), self.boundaries, 4),
-                   DirichletBC(block_V.sub(i), Constant(0.0), self.boundaries, 5),
-                   DirichletBC(block_V.sub(i), Constant(0.0), self.boundaries, 6)] for i in range(2*Nt, 3*Nt)]] )
-         
+            bc0 = BlockDirichletBC(  [[DirichletBC(block_V.sub(i), Constant(0.0), self.boundaries, 1) for i in range(2*Nt, 3*Nt)], None, None],
+                                     [[DirichletBC(block_V.sub(i), Constant(0.0), self.boundaries, 2) for i in range(2*Nt, 3*Nt)], None, None],
+                                     [[DirichletBC(block_V.sub(i), Constant(0.0), self.boundaries, 4) for i in range(2*Nt, 3*Nt)], None, None],
+                                     [[DirichletBC(block_V.sub(i), Constant(0.0), self.boundaries, 5) for i in range(2*Nt, 3*Nt)], None, None],
+                                     [[DirichletBC(block_V.sub(i), Constant(0.0), self.boundaries, 6) for i in range(2*Nt, 3*Nt)], None, None] )
             return (bc0,)
         elif term == "inner_product":
             u = self.u
@@ -124,8 +143,8 @@ boundaries = MeshFunction("size_t", mesh, "data/graetzOC_N_18798_facet_region.xm
 print("hMax: ", mesh.hmax() )
 
 # 2 Create Finite Element space (Lagrange P1)
-T = 3.0
-dt = 0.5
+T = 1.0
+dt = 0.1
 Nt = int(ceil(T/dt))
 
 # BOUNDARY RESTRICTIONS #

@@ -7,7 +7,7 @@ from reduction_methods import *
 
 For this problem the affine decomposition is straightforward.
 """
-@PullBackFormsToReferenceDomain()
+#@PullBackFormsToReferenceDomain()
 @ShapeParametrization(
     ("x[0]", "x[1]"), # subdomain 1
     ("mu[1]*(x[0] - 1) + 1", "x[1]"), # subdomain 2
@@ -35,7 +35,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         self.y_d = Constant(1.0)
         # Store the velocity expression
         self.vel = Expression("x[1] * (1 - x[1])", element=self.V.sub(0).ufl_element())
-        #self.lifting = Expression('((x[0] >= 1 && x[0] <= 2) && (x[1] == 1.0 || x[1]== 0.0) ) ? 1. : 0.', degree=1, domain=mesh)
+        
         # Customize linear solver parameters
         self._linear_solver_parameters.update({
             "linear_solver": "mumps"
@@ -53,7 +53,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             theta_a1 = 4.0
             theta_a2 = 1/(mu[0]*mu[1])
             theta_a3 = (mu[1])/(mu[0])
-            theta_a4 = 4.0*mu[1]
+            theta_a4 = 4.0
             return (theta_a0, theta_a1, theta_a2, theta_a3, theta_a4)
         elif term in ("c", "c*"):
             theta_c0 = 1.0
@@ -90,7 +90,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             a0 = inner(grad(y), grad(q)) * dx(1)
             a1 = vel * y.dx(0) * q * dx(1)
             a2 = y.dx(0) * q.dx(0) * dx(2)
-            a3 = y.dx(0) * q.dx(1) * dx(2)
+            a3 = y.dx(1) * q.dx(1) * dx(2)
             a4 = vel * y.dx(0) * q * dx(2)
             return (a0, a1, a2, a3, a4)
         elif term == "a*":
@@ -100,8 +100,8 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             as0 = inner(grad(z), grad(p)) * dx(1)
             as1 = -vel * p.dx(0) * z * dx(1)
             as2 = - z.dx(0) * p.dx(0) * dx(2)
-            as3 = - z.dx(0) * p.dx(1) * dx(2)
-            as4 = - vel * z.dx(0) * p * dx(2)
+            as3 = - z.dx(1) * p.dx(1) * dx(2)
+            as4 = - vel * p.dx(0) * z * dx(2)
             return (as0, as1, as2, as3, as4)
         elif term == "c":
             u = self.u

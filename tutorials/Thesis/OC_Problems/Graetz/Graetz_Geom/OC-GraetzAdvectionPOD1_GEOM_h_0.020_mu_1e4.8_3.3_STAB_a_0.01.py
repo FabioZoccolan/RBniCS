@@ -50,7 +50,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Return custom problem name
     def name(self):
-        return "AAAdvectionOCGraetzPOD1_GEOM_STAB_h_0.020_mu_1e4.8_3.3_alpha_0.01"
+        return "AdvectionOCGraetzPOD1_GEOM_STAB_h_0.020_mu_1e4.8_3.3_alpha_0.01"
 
     # Return theta multiplicative terms of the affine expansion of the problem.
     def compute_theta(self, term):
@@ -61,7 +61,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             theta_a1 = 4.0
             theta_a2 = 1/(mu[0]*mu[1])
             theta_a3 = (mu[1])/(mu[0])
-            theta_a4 = 4.0*mu[1]
+            theta_a4 = 4.0
             if self.stabilized:
                 delta = self.delta
                 theta_a5 = delta * 4.0
@@ -125,7 +125,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             a0 = inner(grad(y), grad(q)) * dx(1)
             a1 = vel * y.dx(0) * q * dx(1)
             a2 = y.dx(0) * q.dx(0) * dx(2)
-            a3 = y.dx(0) * q.dx(1) * dx(2)
+            a3 = y.dx(1) * q.dx(1) * dx(2)
             a4 = vel * y.dx(0) * q * dx(2)
             a5 = h * vel * y.dx(0) * q.dx(0) * dx(1) #in case, take all the domain
             a6 = h * vel * y.dx(0) * q.dx(0) * dx(2) + h * vel * y.dx(0) * q.dx(0) * dx(3) + h * vel * y.dx(0) * q.dx(0) * dx(4)
@@ -138,8 +138,8 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             as0 = inner(grad(z), grad(p)) * dx(1)
             as1 = -vel * p.dx(0) * z * dx(1)
             as2 = - p.dx(0) * z.dx(0) * dx(2)
-            as3 = - p.dx(0) * z.dx(1) * dx(2)
-            as4 = - vel * z.dx(0) * p * dx(2)
+            as3 = - p.dx(1) * z.dx(1) * dx(2)
+            as4 = - vel * p.dx(0) * z * dx(2)
             as5 = h * vel * p.dx(0) * z.dx(0) * dx(1) #in case, take all the domain
             as6 = h * vel * p.dx(0) * z.dx(0) * dx(2) + h * vel * p.dx(0) * z.dx(0) * dx(3) + h * vel * p.dx(0) * z.dx(0) * dx(4)
             return (as0, as1, as2, as3, as4, as5, as6)

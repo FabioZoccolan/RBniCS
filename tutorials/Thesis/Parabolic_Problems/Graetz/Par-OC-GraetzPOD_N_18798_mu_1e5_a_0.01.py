@@ -46,10 +46,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
     # Return custom problem name
     def name(self):
         return "Parabolic_OCGraetzRB_N_18798_mu_1e5_alpha_0.01"
-        
-        # Return stability factor
-    def get_stability_factor_lower_bound(self):
-        return 1.
+
 
     # Return theta multiplicative terms of the affine expansion of the problem.
     def compute_theta(self, term):
@@ -137,7 +134,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             z = self.z
             m0_0 = zeros((Nt, Nt), dtype=object)
             for i in range(Nt):
-                m0_0[i,i] = dt*inner(y[i], z[i])*dx
+                m0_0[i,i] = dt*inner(y[i], z[i])*dx(3) + dt*inner(y[i], z[i])*dx(4)
             m0 = [[m0_0, 0, 0], [0, 0, 0], [0, 0, 0]]
             return (BlockForm(m0),)
         elif term == "n":
