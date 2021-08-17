@@ -28,10 +28,11 @@ from numpy import ceil, zeros, isclose
 For this problem the affine decomposition is straightforward.
 """
 
+@OnlineStabilization()
 class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Default initialization of members
-    def __init__(self, V, **kwargs):
+    def __init__(self, block_V, **kwargs):
         # Call the standard initialization
         EllipticOptimalControlProblem.__init__(self, block_V, **kwargs)
         # ... and also store FEniCS data structures for assembly
@@ -39,19 +40,24 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         assert "boundaries" in kwargs
         self.subdomains, self.boundaries = kwargs["subdomains"], kwargs["boundaries"]
         block_yup = BlockTrialFunction(block_V)
-        (self.y, self.u, self.p) = block_yup
+        (self.y, self.u, self.p) = block_split(block_yup)
         block_zvq = BlockTestFunction(block_V)
-        (self.z, self.v, self.q) = block_zvq
+        (self.z, self.v, self.q) = block_split(block_zvq)
         self.dx = Measure("dx")(subdomain_data=subdomains)
         self.ds = Measure("ds")(subdomain_data=boundaries)
+        
         # Regularization coefficient
         self.alpha = 0.01
         self.y_d = Constant(1.0)
-        # Store the velocity expression
-        self.vel = Expression("x[1] * (1 - x[1])", degree=2, domain=mesh)
-        #self.lifting = Expression('((x[0] >= 1 && x[0] <= 2) && (x[1] == 1.0 || x[1]== 0.0) ) ? 1. : 0.', degree=1, domain=mesh)
         
-        self.y_0 =Constant(0.0)
+        # Store the velocity expression
+        self.vel = Expression("x[1] * (1 - x[1])", degree=1, domain=mesh)
+  
+        self.f_0 = Constant(1.0)
+        
+        self.delta = 1.0
+        self.h = CellDiameter(block_V.mesh())
+        
         
         # Customize linear solver parameters
         self._linear_solver_parameters.update({
@@ -60,7 +66,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Return custom problem name
     def name(self):
-        return "Boundary_OCGraetzRB_N_18798_mu_1e5_alpha_0.01"
+        return "Boundary_OCGraetzPOD_h_0.029_mu_1e5_alpha_0.01"
     
     # Return theta multiplicative terms of the affine expansion of the problem.
     def compute_theta(self, term):
@@ -68,22 +74,44 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         if term in ("a", "a*"):
             theta_a0 = 1/(mu[0])
             theta_a1 = 4.0
-            return (theta_a0, theta_a1)
+            if self.stabilized:
+              delta = self.delta
+              theta_a2 = delta * 4.0
+              theta_a3 = delta * 4.0
+            else:
+              theta_a2 = 0.0
+              theta_a3 = 0.0
+            return (theta_a0, theta_a1, theta_a2, theta_a3)
         elif term in ("c", "c*"):
             theta_c0 = 1.0
-            return (theta_c0,)
+            if self.stabilized:
+               delta = self.delta
+               theta_c1 = delta
+            else:
+               theta_c1 = 0.0
+            return (theta_c0,theta_c1)
         elif term == "m":
             theta_m0 = 1.0
-            return (theta_m0,)
+            if self.stabilized:
+                delta = self.delta
+                theta_m1 = delta
+            else:
+                theta_m1 = 0.0
+            return (theta_m0, theta_m1)
         elif term == "n":
             theta_n0 = self.alpha
             return (theta_n0,)
         elif term == "f":
-            theta_f0 = 1.0
+            theta_f0 = 0.0
             return (theta_f0, )
         elif term == "g":
             theta_g0 = 1.
-            return (theta_g0,)
+            if self.stabilized:
+               delta = self.delta
+               theta_g1 = delta
+            else:
+               theta_g1 = 0.0
+            return (theta_g0, theta_g1)
         elif term == "h":
             theta_h0 = 1.
             return (theta_h0,)
@@ -100,56 +128,79 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             y = self.y
             q = self.q
             vel = self.vel  
+            h = self.h
             a0_0 = inner(grad(y), grad(q))*dx
             a1_0 = vel * y.dx(0) * q * dx 
+            a2_0 = h * vel * y.dx(0) * q.dx(0) * dx(1)
+            a3_0 = h * vel * y.dx(0) * q.dx(0) * dx(2)+ h * vel * y.dx(0) * q.dx(0) * dx(3)+h * vel * y.dx(0) * q.dx(0) * dx(4)
             a0 = [[0, 0, 0], [0, 0, 0], [a0_0, 0, 0]]
             a1 = [[0, 0, 0], [0, 0, 0], [a1_0, 0, 0]]
-            return (BlockForm(a0), BlockForm(a1))
+            a2 = [[0, 0, 0], [0, 0, 0], [a2_0, 0, 0]]
+            a3 = [[0, 0, 0], [0, 0, 0], [a3_0, 0, 0]]
+            return (BlockForm(a0), BlockForm(a1),BlockForm(a2), BlockForm(a3))
         elif term == "a*":
             z = self.z
             p = self.p
             vel = self.vel
+            h = self.h
             as0_0 = inner(grad(p), grad(z))*dx
             as1_0 = -vel * p.dx(0) * z * dx 
+            as2_0 = h * vel * p.dx(0) * z.dx(0) * dx(1)
+            as3_0 = h * vel * p.dx(0) * z.dx(0) * dx(2) + h * vel * p.dx(0) * z.dx(0) * dx(3) + h * vel * p.dx(0) * z.dx(0) * dx(4)
             as0 = [[0, 0, as0_0], [0, 0, 0], [0, 0, 0]]
             as1 = [[0, 0, as1_0], [0, 0, 0], [0, 0, 0]]
-            return (BlockForm(as0), BlockForm(as1))
+            as2 = [[0, 0, as2_0], [0, 0, 0], [0, 0, 0]]
+            as3 = [[0, 0, as3_0], [0, 0, 0], [0, 0, 0]]
+            return (BlockForm(as0), BlockForm(as1), BlockForm(as2), BlockForm(as3))
         elif term == "c":
             u = self.u
             q = self.q
+            h = self.h
             c0_0 = u*q*ds(0)
+            c1_0 = h * u * q.dx(0) * ds(0)
             c0 = [[0, 0, 0], [0, 0, 0], [0, c0_0, 0]]
-            return(BlockForm(c0),)
+            c1 = [[0, 0, 0], [0, 0, 0], [0, c1_0, 0]]
+            return(BlockForm(c0),BlockForm(c1))
         elif term == "c*":
             v = self.v
             p = self.p
+            h = self.h
             cs0_0 = p*v*ds(0)
+            cs1_0 = Constant(0.0) * - h * v.dx(0) * p * ds(0)
             cs0 = [[0, 0, 0], [0, 0, cs0_0], [0, 0, 0]]
-            return(BlockForm(cs0),)
+            cs1 = [[0, 0, 0], [0, 0, cs1_0], [0, 0, 0]]
+            return(BlockForm(cs0),BlockForm(cs1))
         elif term == "m":
             y = self.y
             z = self.z
-            m0_0 = y * z *dx(3) + y * z* dx(4)
+            h = self.h
+            m0_0 = y * z *dx
+            m1_0 = -h * y * z.dx(0) * dx
             m0 = [[m0_0, 0, 0], [0, 0, 0], [0, 0, 0]]
-            return (BlockForm(m0),)
+            m1 = [[m1_0, 0, 0], [0, 0, 0], [0, 0, 0]]
+            return (BlockForm(m0),BlockForm(m1))
         elif term == "n":
             u = self.u
             v = self.v
+            h = self.h
             n0_0 = u*v*ds(0)
             n0 = [[0, 0, 0], [0, n0_0, 0], [0, 0, 0]]
             return (BlockForm(n0),)
         elif term == "f":
             q = self.q
-            y_0 = self.y_0
-            f0_0 = y_0 * q *dx 
+            f_0 = self.f_0
+            f0_0 = f_0 * q *dx 
             f0 = [0, 0, f0_0] 
             return (BlockForm(f0),)
         elif term == "g":
             y_d = self.y_d
             z = self.z
+            h = self.h
             g0_0 = y_d * z * dx(3) + y_d * z* dx(4)
+            g1_0 = - h * y_d * z.dx(0) * dx(3) - h * y_d * z.dx(0) * dx(4)
             g0 = [g0_0, 0, 0]
-            return (BlockForm(g0),)
+            g1 = [g1_0, 0, 0]
+            return (BlockForm(g0),BlockForm(g1))
         elif term == "h":
             y_d = self.y_d
             h0 = y_d * y_d * dx(3, domain=mesh) + y_d * y_d * dx(4, domain=mesh)  #RICONTROLLARE
@@ -177,7 +228,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         elif term == "inner_product_u":
             u = self.u
             v = self.v
-            x0_u = inner(u, v)*dx
+            x0_u = u* v *ds
             x0 = [[0, 0, 0], [0, x0_u, 0], [0, 0, 0]]
             return (BlockForm(x0),)
         elif term == "inner_product_p":
@@ -210,9 +261,10 @@ p_restrict.append(None)
    
 # FUNCTION SPACES #
 scalar_element = FiniteElement("Lagrange", mesh.ufl_cell(), 1)
-element = BlockElement([scalar_element] + [scalar_element] + [ scalar_element])
+real_element = FiniteElement("Lagrange", mesh.ufl_cell(),1)
+element = BlockElement([scalar_element] + [real_element] + [scalar_element])
 components = ["y"]+ ["u"] + ["p"]
-block_V = BlockFunctionSpace(mesh, element, restrict = [None, control_boundary, None], components=[*components])
+block_V = BlockFunctionSpace(mesh, element, restrict = [*y_restrict, *u_restrict, *p_restrict], components=[*components])
 print("Dim: ", block_V.dim() )
 
 
@@ -225,7 +277,7 @@ offline_mu = (1e5, 1.0)
 elliptic_optimal_control.init()
 elliptic_optimal_control.set_mu(offline_mu)
 elliptic_optimal_control.solve()
-elliptic_optimal_control.export_solution(filename="BoundaryFEM_Par_OCGraetz_N_18798_mu_1e5_alpha_0.01")
+elliptic_optimal_control.export_solution(filename="BoundaryFEM_OCGraetz_h_0.029_mu_1e5_alpha_0.01")
 
 
 
@@ -233,13 +285,8 @@ elliptic_optimal_control.export_solution(filename="BoundaryFEM_Par_OCGraetz_N_18
 
 # In[ ]:
 
-
-
 pod_galerkin_method = PODGalerkin(elliptic_optimal_control)
 pod_galerkin_method.set_Nmax(3)
-
-
-
 
 # ### 4.5. Perform the offline phase
 
@@ -261,7 +308,7 @@ online_mu = (1e5, 1.0)
 reduced_elliptic_optimal_control.set_mu(online_mu)
 reduced_solution = reduced_elliptic_optimal_control.solve()
 print("Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
-reduced_elliptic_optimal_control.export_solution(filename="Boundary_online_solution_Par_OCGraetz_N_18798_mu_1e5_alpha_0.01")
+reduced_elliptic_optimal_control.export_solution(filename="Boundary_online_solution_OCGraetz_h_0.029_mu_1e5_alpha_0.01")
 
 # In[ ]:
 

@@ -37,10 +37,10 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         #self.lifting = Expression('((x[0] >= 1 && x[0] <= 2) && (x[1] == 1.0 || x[1]== 0.0) ) ? 1. : 0.', degree=1, domain=mesh)
         
         #self.y_0 = Expression(("0."), degree=1, domain=mesh)
-        self.y_0 = Expression("1.0", degree=1, domain=mesh) #self.y_0 = Expression("1.0-1.0*(x[0]==0)-1.0*( x[0] <= 1)*(x[1]==0)-1.0*(x[0] <= 1)*( x[1]==1) ", degree=1, domain=mesh)
+        self.y_0 =Expression("1.0", degree=1, domain=mesh) #self.y_0 = Expression("1.0-1.0*(x[0]==0)-1.0*( x[0] <= 1)*(x[1]==0)-1.0*(x[0] <= 1)*( x[1]==1) ", degree=1, domain=mesh)
+        #OCCHIO CHE QUELLO ERA L'IDEA DELL'ALTRO
         
-        
-        self.delta = 2.0
+        self.delta = 1.0
         
         self.h = CellDiameter(block_V.mesh())
         
@@ -51,7 +51,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Return custom problem name
     def name(self):
-        return "Parabolic_OCGraetzPOD2_h_0.029_STAB_mu_1e5_alpha_0.01_d_1"
+        return "Parabolic_OCGraetzPOD1_h_0.029_STAB_mu_1e5_alpha_0.01_d_1"
 
 
     # Return theta multiplicative terms of the affine expansion of the problem.
@@ -207,8 +207,8 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             m0_0 = zeros((Nt, Nt), dtype=object)
             m1_0 = zeros((Nt, Nt), dtype=object)
             for i in range(Nt):
-                m0_0[i,i] = dt*inner(y[i], z[i])*dx(3) + dt*inner(y[i], z[i])*dx(4)
-                m1_0[i,i] = - dt * h * inner(y[i], z[i].dx(0)) * dx(3) - dt * h * inner(y[i], z[i].dx(0)) * dx(4)
+                m0_0[i,i] = dt*inner(y[i], z[i])*dx
+                m1_0[i,i] = - dt * h * inner(y[i], z[i].dx(0)) * dx
             m0 = [[m0_0, 0, 0], [0, 0, 0], [0, 0, 0]]
             m1 = [[m1_0, 0, 0], [0, 0, 0], [0, 0, 0]]
             return (BlockForm(m0),BlockForm(m1))
@@ -303,8 +303,8 @@ boundaries = MeshFunction("size_t", mesh, "data/graetzOC_h_0.029_facet_region.xm
 print("hMax: ", mesh.hmax() )
 
 # 2 Create Finite Element space (Lagrange P1)
-T = 2.0
-dt = 0.4
+T = 0.5
+dt = 0.125
 Nt = int(ceil(T/dt))
 
 # BOUNDARY RESTRICTIONS #
@@ -335,7 +335,7 @@ offline_mu = (1e5, 1.0)
 elliptic_optimal_control.init()
 elliptic_optimal_control.set_mu(offline_mu)
 elliptic_optimal_control.solve()
-elliptic_optimal_control.export_solution(filename="FEM_Par_OCGraetz2_h_0.029_STAB_mu_1e5_alpha_0.01")
+elliptic_optimal_control.export_solution(filename="FEM_Par_OCGraetz1_h_0.029_STAB_mu_1e5_alpha_0.01")
 
 
 # ### 4.4. Prepare reduction with a reduced basis method
@@ -370,7 +370,7 @@ online_mu = (1e5, 1.0)
 reduced_elliptic_optimal_control.set_mu(online_mu)
 reduced_solution = reduced_elliptic_optimal_control.solve()
 print("Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
-reduced_elliptic_optimal_control.export_solution(filename="online_solution_Par_OCGraetz2_STAB_h_0.029_mu_1e5_alpha_0.01")
+reduced_elliptic_optimal_control.export_solution(filename="online_solution_Par_OCGraetz1_STAB_h_0.029_mu_1e5_alpha_0.01")
 
 # In[ ]:
 
