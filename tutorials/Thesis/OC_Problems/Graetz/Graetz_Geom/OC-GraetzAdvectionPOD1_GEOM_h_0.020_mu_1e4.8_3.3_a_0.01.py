@@ -92,9 +92,9 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             vel = self.vel
             a0 = inner(grad(y), grad(q)) * dx(1)
             a1 = vel * y.dx(0) * q * dx(1)
-            a2 = y.dx(0) * q.dx(0) * dx(2)
-            a3 = y.dx(1) * q.dx(1) * dx(2)
-            a4 = vel * y.dx(0) * q * dx(2)
+            a2 = y.dx(0) * q.dx(0) * dx(2) + y.dx(0) * q.dx(0) * dx(3) + y.dx(0) * q.dx(0) * dx(4)
+            a3 = y.dx(1) * q.dx(1) * dx(2) + y.dx(1) * q.dx(1) * dx(3) + y.dx(1) * q.dx(1) * dx(4)
+            a4 = vel * y.dx(0) * q * dx(2) + vel * y.dx(0) * q * dx(3) + vel * y.dx(0) * q * dx(4)
             return (a0, a1, a2, a3, a4)
         elif term == "a*":
             z = self.z
@@ -102,9 +102,9 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             vel = self.vel
             as0 = inner(grad(z), grad(p)) * dx(1)
             as1 = -vel * p.dx(0) * z * dx(1)
-            as2 = - z.dx(0) * p.dx(0) * dx(2)
-            as3 = - z.dx(1) * p.dx(1) * dx(2)
-            as4 = - vel * p.dx(0) * z * dx(2)
+            as2 = - p.dx(0) * z.dx(0) * dx(2) - p.dx(0) * z.dx(0) * dx(3) - p.dx(0) * z.dx(0) * dx(4)
+            as3 = - p.dx(1) * z.dx(1) * dx(2) - p.dx(1) * z.dx(1) * dx(3) - p.dx(1) * z.dx(1) * dx(4)
+            as4 = - vel * p.dx(0) * z * dx(2) - vel * p.dx(0) * z * dx(3) - vel * p.dx(0) * z * dx(4)
             return (as0, as1, as2, as3, as4)
         elif term == "c":
             u = self.u
