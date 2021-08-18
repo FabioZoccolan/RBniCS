@@ -9,7 +9,7 @@ For this problem the affine decomposition is straightforward.
 """
 
 @OnlineStabilization()
-#@PullBackFormsToReferenceDomain()
+@PullBackFormsToReferenceDomain()
 @ShapeParametrization(
     ("x[0]", "x[1]"), # subdomain 1
     ("mu[1]*(x[0] - 1) + 1", "x[1]"), # subdomain 2
@@ -65,47 +65,50 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             if self.stabilized:
                 delta = self.delta
                 theta_a5 = delta * 4.0
-                theta_a6 = delta *  (4.0)/(sqrt(mu[1]))
+                theta_a6 = delta * (4.0)/(sqrt(mu[1]))
             else:
                 theta_a5 = 0.0
                 theta_a6 = 0.0
             return (theta_a0, theta_a1, theta_a2, theta_a3, theta_a4, theta_a5, theta_a6)
         elif term in ("c", "c*"):
-            theta_c0 = 1.0
+            theta_c0 = 1.0 
+            theta_c1 = mu[1]
             if self.stabilized:
                delta = self.delta
-               theta_c1 = delta * 4.0
-               theta_c2 = delta *  (4.0)/(sqrt(mu[1]))
+               theta_c2 = delta * 1.0
+               theta_c3 = delta *(1.0)/(sqrt(mu[1]))
             else:
-               theta_c1 = 0.0
                theta_c2 = 0.0
-            return (theta_c0,theta_c1, theta_c2 )
+               theta_c3 = 0.0
+            return (theta_c0,theta_c1, theta_c2, theta_c3 )
         elif term == "m":
             theta_m0 = 1.0
+            theta_m1 = mu[1]
             if self.stabilized:
                 delta = self.delta
-                theta_m1 = delta * 4.0
-                theta_m2 = delta *  (4.0)/(sqrt(mu[1]))
+                theta_m2 = delta * 1.0
+                theta_m3 = delta * (1.0)/(sqrt(mu[1]))
             else:
-                theta_m1 = 0.0
                 theta_m2 = 0.0
-            return (theta_m0, theta_m1, theta_m2)
+                theta_m3 = 0.0
+            return (theta_m0, theta_m1, theta_m2, theta_m3)
         elif term == "n":
             theta_n0 = self.alpha
-            return (theta_n0,)
+            theta_n1= self.alpha * mu[1]
+            return (theta_n0,theta_n1)
         elif term == "f":
             theta_f0 = 0.0
             return (theta_f0, )
         elif term == "g":
-            theta_g0 = 1.
+            theta_g0 = mu[1]
             if self.stabilized:
                 delta = self.delta
-                theta_g1 = delta *  (4.0)/(sqrt(mu[1]))
+                theta_g1 = delta *(1.0)/(sqrt(mu[1]))
             else:
                 theta_g1 = 0.0
             return (theta_g0, theta_g1)
         elif term == "h":
-            theta_h0 = 1.
+            theta_h0 = mu[1]
             return (theta_h0,)
         elif term == "dirichlet_bc_y":
             theta_bc0 = 1.
@@ -137,8 +140,8 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             h = self.h
             as0 = inner(grad(z), grad(p)) * dx(1)
             as1 = -vel * p.dx(0) * z * dx(1)
-            as2 = - z.dx(0) * p.dx(0) * dx(2)
-            as3 = - z.dx(1) * p.dx(1) * dx(2)
+            as2 = - p.dx(0) * z.dx(0) * dx(2)
+            as3 = - p.dx(1) * z.dx(1) * dx(2)
             as4 = - vel * p.dx(0) * z * dx(2)
             as5 = h * vel * p.dx(0) * z.dx(0) * dx(1) #in case, take all the domain
             as6 = h * vel * p.dx(0) * z.dx(0) * dx(2) + h * vel * p.dx(0) * z.dx(0) * dx(3) + h * vel * p.dx(0) * z.dx(0) * dx(4)
@@ -147,31 +150,35 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             u = self.u
             q = self.q
             h = self.h
-            c0 = u * q * dx
-            c1 = h * u * q.dx(0) * dx(1)
-            c2 = h * u * q.dx(0) * dx(2) + h * u * q.dx(0) * dx(3) + h * u * q.dx(0) * dx(4)
-            return (c0,c1,c2)
+            c0 = u * q * dx(1)
+            c1 = u * q * dx(2) + u * q * dx(3) + u * q * dx(4)
+            c2 = h * u * q.dx(0) * dx(1)
+            c3 = h * u * q.dx(0) * dx(2) + h * u * q.dx(0) * dx(3) + h * u * q.dx(0) * dx(4)
+            return (c0,c1,c2,c3)
         elif term == "c*":
             v = self.v
             p = self.p
             h = self.h
-            cs0 = v * p * dx
-            cs1 = Constant(0.0) * - h * v.dx(0) * p * dx
+            cs0 = v * p * dx(1)
+            cs1 = v * p * dx(2) + v * p * dx(3) + v * p * dx(4)
             cs2 = Constant(0.0) * - h * v.dx(0) * p * dx
-            return (cs0,cs1,cs2)
+            cs3 = Constant(0.0) * - h * v.dx(0) * p * dx
+            return (cs0,cs1,cs2, cs3)
         elif term == "m":
             y = self.y
             z = self.z
             h = self.h
-            m0 = y * z * dx
-            m1 = - h * y * z.dx(0) * dx(1)
-            m2 = - h * y * z.dx(0) * dx(2) - h * y * z.dx(0) * dx(3) - h * y * z.dx(0) * dx(4) 
-            return (m0,m1,m2)
+            m0 = y * z * dx(1)
+            m1 = y * z * dx(2) + y * z * dx(3) + y * z * dx(4)
+            m2 = - h * y * z.dx(0) * dx(1)
+            m3 = - h * y * z.dx(0) * dx(2) - h * y * z.dx(0) * dx(3) - h * y * z.dx(0) * dx(4) 
+            return (m0,m1,m2,m3)
         elif term == "n":
             u = self.u
             v = self.v
-            n0 = u * v * dx
-            return (n0,)
+            n0 = u * v * dx(1)
+            n1 = u * v * dx(2) + u * v * dx(3) + u * v * dx(4)
+            return (n0, n1)
         elif term == "f":
             q = self.q
             f0 = Constant(0.0) * q * dx
@@ -219,6 +226,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             return (x0,)
         else:
             raise ValueError("Invalid term for assemble_operator().")
+
 
 """## 4. Main program
 

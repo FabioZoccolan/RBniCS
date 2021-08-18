@@ -7,7 +7,7 @@ from reduction_methods import *
 
 For this problem the affine decomposition is straightforward.
 """
-#@PullBackFormsToReferenceDomain()
+@PullBackFormsToReferenceDomain()
 @ShapeParametrization(
     ("x[0]", "x[1]"), # subdomain 1
     ("mu[1]*(x[0] - 1) + 1", "x[1]"), # subdomain 2
@@ -57,21 +57,23 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             return (theta_a0, theta_a1, theta_a2, theta_a3, theta_a4)
         elif term in ("c", "c*"):
             theta_c0 = 1.0
-            return (theta_c0,)
+            theta_c1 = mu[1]
+            return (theta_c0,theta_c1)
         elif term == "m":
-            theta_m0 = 1.0
+            theta_m0 = mu[1]
             return (theta_m0,)
         elif term == "n":
             theta_n0 = self.alpha
-            return (theta_n0,)
+            theta_n1= self.alpha * mu[1]
+            return (theta_n0,theta_n1)
         elif term == "f":
             theta_f0 = 0.0
             return (theta_f0, )
         elif term == "g":
-            theta_g0 = 1.
+            theta_g0 = mu[1]
             return (theta_g0,)
         elif term == "h":
-            theta_h0 = 1.
+            theta_h0 = mu[1]
             return (theta_h0,)
         elif term == "dirichlet_bc_y":
             theta_bc0 = 1.
@@ -106,23 +108,26 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         elif term == "c":
             u = self.u
             q = self.q
-            c0 = u * q * dx
-            return (c0,)
+            c0 = u * q * dx(1)
+            c1 = u * q * dx(2) + u * q * dx(3) + u * q * dx(4)
+            return (c0,c1)
         elif term == "c*":
             v = self.v
             p = self.p
-            cs0 = v * p * dx
-            return (cs0,)
+            cs0 = v * p * dx(1)
+            cs1 = v * p * dx(2) + v * p * dx(3) + v * p * dx(4)
+            return (cs0,cs1)
         elif term == "m":
             y = self.y
             z = self.z
             m0 = y * z * dx(3) + y * z * dx(4)
-            return (m0,)
+            return (m0,)         
         elif term == "n":
             u = self.u
             v = self.v
-            n0 = u * v * dx
-            return (n0,)
+            n0 = u * v * dx(1)
+            n1 = u * v * dx(2) + u * v * dx(3) + u * v * dx(4)
+            return (n0, n1)
         elif term == "f":
             q = self.q
             f0 = Constant(0.0) * q * dx
@@ -168,6 +173,8 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             return (x0,)
         else:
             raise ValueError("Invalid term for assemble_operator().")
+
+
 
 """## 4. Main program
 

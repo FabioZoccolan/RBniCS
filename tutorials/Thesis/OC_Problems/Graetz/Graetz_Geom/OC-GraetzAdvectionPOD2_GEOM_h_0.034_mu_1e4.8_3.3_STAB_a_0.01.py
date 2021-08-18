@@ -9,7 +9,7 @@ For this problem the affine decomposition is straightforward.
 """
 
 @OnlineStabilization()
-#@PullBackFormsToReferenceDomain()
+@PullBackFormsToReferenceDomain()
 @ShapeParametrization(
     ("x[0]", "x[1]"), # subdomain 1
     ("mu[1]*(x[0] - 1) + 1", "x[1]"), # subdomain 2
@@ -65,7 +65,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             if self.stabilized:
                 delta = self.delta
                 theta_a5 = delta * 4.0
-                theta_a6 = delta *  (4.0)/(sqrt(mu[1]))
+                theta_a6 = delta * (4.0)/(sqrt(mu[1]))
             else:
                 theta_a5 = 0.0
                 theta_a6 = 0.0
@@ -74,8 +74,8 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             theta_c0 = 1.0
             if self.stabilized:
                delta = self.delta
-               theta_c1 = delta * 4.0
-               theta_c2 = delta *  (4.0)/(sqrt(mu[1]))
+               theta_c1 = delta * 1.0
+               theta_c2 = delta *(1.0)/(sqrt(mu[1]))
             else:
                theta_c1 = 0.0
                theta_c2 = 0.0
@@ -84,7 +84,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             theta_m0 = 1.0
             if self.stabilized:
                 delta = self.delta
-                theta_m1 = delta * (4.0)/(sqrt(mu[1]))
+                theta_m1 = delta * (1.0)/(sqrt(mu[1]))
             else:
                 theta_m1 = 0.0
             return (theta_m0, theta_m1)
@@ -98,7 +98,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             theta_g0 = 1.
             if self.stabilized:
                 delta = self.delta
-                theta_g1 = delta *  (4.0)/(sqrt(mu[1]))
+                theta_g1 = delta *(1.0)/(sqrt(mu[1]))
             else:
                 theta_g1 = 0.0
             return (theta_g0, theta_g1)
@@ -135,8 +135,8 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             h = self.h
             as0 = inner(grad(z), grad(p)) * dx(1)
             as1 = -vel * p.dx(0) * z * dx(1)
-            as2 = - z.dx(0) * p.dx(0) * dx(2)
-            as3 = - z.dx(1) * p.dx(1) * dx(2)
+            as2 = - p.dx(0) * z.dx(0) * dx(2)
+            as3 = - p.dx(1) * z.dx(1) * dx(2)
             as4 = - vel * p.dx(0) * z * dx(2)
             as5 = h * vel * p.dx(0) * z.dx(0) * dx(1) #in case, take all the domain
             as6 = h * vel * p.dx(0) * z.dx(0) * dx(2) + h * vel * p.dx(0) * z.dx(0) * dx(3) + h * vel * p.dx(0) * z.dx(0) * dx(4)
@@ -248,7 +248,7 @@ offline_mu = (10**4.8, 3.3)
 problem.init()
 problem.set_mu(offline_mu)
 problem.solve()
-problem.export_solution(filename="FEM_OCGraetz2_GEOM_STAB_N_13146_mu_1e4.8_3.3_alpha_0.01")
+problem.export_solution(filename="FEM_OCGraetz2_GEOM_STAB_h_0.034_mu_1e4.8_3.3_alpha_0.01")
 
 # ### 4.4. Prepare reduction with a reduced basis method
 
@@ -276,7 +276,7 @@ online_mu = (10**4.8, 3.3)
 reduced_elliptic_optimal_control.set_mu(online_mu)
 reduced_solution = reduced_elliptic_optimal_control.solve()
 print("Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
-reduced_elliptic_optimal_control.export_solution(filename="online_solution_OCGraetz2_GEOM_STAB_N_13146_mu_1e4.8_3.3_alpha_0.01")
+reduced_elliptic_optimal_control.export_solution(filename="online_solution_OCGraetz2_GEOM_STAB_h_0.034_mu_1e4.8_3.3_alpha_0.01")
 
 # ### 4.7. Perform an error analysis
 

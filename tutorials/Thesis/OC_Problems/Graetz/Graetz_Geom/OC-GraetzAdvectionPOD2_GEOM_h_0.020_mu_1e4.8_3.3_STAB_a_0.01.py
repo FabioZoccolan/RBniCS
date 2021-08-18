@@ -9,7 +9,7 @@ For this problem the affine decomposition is straightforward.
 """
 
 @OnlineStabilization()
-#@PullBackFormsToReferenceDomain()
+@PullBackFormsToReferenceDomain()
 @ShapeParametrization(
     ("x[0]", "x[1]"), # subdomain 1
     ("mu[1]*(x[0] - 1) + 1", "x[1]"), # subdomain 2
@@ -74,8 +74,8 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             theta_c0 = 1.0
             if self.stabilized:
                delta = self.delta
-               theta_c1 = delta * 4.0
-               theta_c2 = delta *(4.0)/(sqrt(mu[1]))
+               theta_c1 = delta * 1.0
+               theta_c2 = delta *(1.0)/(sqrt(mu[1]))
             else:
                theta_c1 = 0.0
                theta_c2 = 0.0
@@ -84,7 +84,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             theta_m0 = 1.0
             if self.stabilized:
                 delta = self.delta
-                theta_m1 = delta * (4.0)/(sqrt(mu[1]))
+                theta_m1 = delta * (1.0)/(sqrt(mu[1]))
             else:
                 theta_m1 = 0.0
             return (theta_m0, theta_m1)
@@ -98,7 +98,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             theta_g0 = 1.
             if self.stabilized:
                 delta = self.delta
-                theta_g1 = delta *(4.0)/(sqrt(mu[1]))
+                theta_g1 = delta *(1.0)/(sqrt(mu[1]))
             else:
                 theta_g1 = 0.0
             return (theta_g0, theta_g1)
