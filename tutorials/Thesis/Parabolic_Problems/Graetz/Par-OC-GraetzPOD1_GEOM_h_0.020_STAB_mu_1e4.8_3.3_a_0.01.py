@@ -10,7 +10,7 @@ from numpy import ceil, zeros, isclose
 For this problem the affine decomposition is straightforward.
 """
 @OnlineStabilization()
-@PullBackFormsToReferenceDomain()
+#@PullBackFormsToReferenceDomain()
 @ShapeParametrization(
     ("x[0]", "x[1]"), # subdomain 1
     ("mu[1]*(x[0] - 1) + 1", "x[1]"), # subdomain 2
@@ -44,7 +44,8 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         #self.lifting = Expression('((x[0] >= 1 && x[0] <= 2) && (x[1] == 1.0 || x[1]== 0.0) ) ? 1. : 0.', degree=1, domain=mesh)
         
         #self.y_0 = Expression(("0."), degree=1, domain=mesh)
-        self.y_0 =Expression("1.0", degree=1, domain=mesh) 
+        
+        self.y_0 = Expression("1.0", degree=1, domain=mesh) 
         
         self.delta = 1.0
         
@@ -74,22 +75,25 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
                 delta = self.delta
                 theta_a5 = delta * 4.0
                 theta_a6 = delta * (4.0)/(sqrt(mu[1]))
-                theta_a8 = delta 
-                theta_a9 = delta * (1.0)/(sqrt(mu[1]))
             else:
                 theta_a5 = 0.0
                 theta_a6 = 0.0
-                theta_a8 = 0.0
-                theta_a9 = 0.0
             theta_a7 = 1.0
-            return (theta_a0, theta_a1, theta_a2, theta_a3, theta_a4, theta_a5, theta_a6, theta_a7, theta_a8, theta_a9)
+            theta_a8 = mu[1]
+            if self.stabilized:
+                theta_a9 = delta 
+                theta_a10 = delta * (1.0)/(sqrt(mu[1]))
+            else:
+                theta_a9 = 0.0
+                theta_a10 = 0.0
+            return (theta_a0, theta_a1, theta_a2, theta_a3, theta_a4, theta_a5, theta_a6, theta_a7, theta_a8, theta_a9, theta_a10)
         elif term in ("c", "c*"):
             theta_c0 = 1.0 
             theta_c1 = mu[1]
             if self.stabilized:
                delta = self.delta
-               theta_c2 = delta * 4.0
-               theta_c3 = delta *(4.0)/(sqrt(mu[1]))
+               theta_c2 = delta * 1.0
+               theta_c3 = delta *(1.0)/(sqrt(mu[1]))
             else:
                theta_c2 = 0.0
                theta_c3 = 0.0
@@ -99,8 +103,8 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             theta_m1 = mu[1]
             if self.stabilized:
                 delta = self.delta
-                theta_m2 = delta * 4.0
-                theta_m3 = delta * (4.0)/(sqrt(mu[1]))
+                theta_m2 = delta * 1.0
+                theta_m3 = delta * (1.0)/(sqrt(mu[1]))
             else:
                 theta_m2 = 0.0
                 theta_m3 = 0.0
@@ -110,13 +114,21 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             theta_n1= self.alpha * mu[1]
             return (theta_n0,theta_n1)
         elif term == "f":
-            theta_f0 = 0.0
-            return (theta_f0, )
+            theta_f0 = 1.0
+            theta_f1 = mu[1]
+            if self.stabilized:
+                delta = self.delta
+                theta_f2 = delta
+                theta_f3 = delta * (1.0)/(sqrt(mu[1]))
+            else:
+                theta_f2 = 0.0
+                theta_f3 = 0.0
+            return (theta_f0, theta_f1, theta_f2, theta_f3)
         elif term == "g":
             theta_g0 = mu[1]
             if self.stabilized:
                 delta = self.delta
-                theta_g1 = delta *(4.0)/(sqrt(mu[1]))
+                theta_g1 = delta *(1.0)/(sqrt(mu[1]))
             else:
                 theta_g1 = 0.0
             return (theta_g0, theta_g1)
@@ -150,21 +162,24 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             m_0 = zeros((Nt, Nt), dtype=object)
             m_1 = zeros((Nt, Nt), dtype=object)
             m_2 = zeros((Nt, Nt), dtype=object)
+            m_3 = zeros((Nt, Nt), dtype=object)
             for i in range(Nt):
                 a0_0[i, i] =  dt*inner(grad(y[i]), grad(q[i]))*dx(1)                
                 a1_0[i, i] =  dt*vel*y[i].dx(0)*q[i]*dx(1)
-                a2_0[i, i] =  dt* y[i].dx(0) * q[i].dx(0) * dx(2) 
-                a3_0[i, i] =  dt* y[i].dx(1) * q[i].dx(1) * dx(2)  
-                a4_0[i, i] =  dt*vel*y[i].dx(0)*q[i]*dx(2) 
+                a2_0[i, i] =  dt* y[i].dx(0) * q[i].dx(0) * dx(2) + dt* y[i].dx(0) * q[i].dx(0) * dx(3) + dt* y[i].dx(0) * q[i].dx(0) * dx(4) 
+                a3_0[i, i] =  dt* y[i].dx(1) * q[i].dx(1) * dx(2) + dt* y[i].dx(1) * q[i].dx(1) * dx(3) + dt* y[i].dx(1) * q[i].dx(1) * dx(4) 
+                a4_0[i, i] =  dt*vel*y[i].dx(0)*q[i]*dx(2) + dt*vel*y[i].dx(0)*q[i]*dx(3) + dt*vel*y[i].dx(0)*q[i]*dx(4)
                 a5_0[i, i] =  dt* h * vel * y[i].dx(0) * q[i].dx(0) * dx(1) 
                 a6_0[i, i] =  dt* h * vel * y[i].dx(0) * q[i].dx(0) * dx(2) + dt*h * vel * y[i].dx(0) * q[i].dx(0) * dx(2) + dt*h * vel * y[i].dx(0) * q[i].dx(0) * dx(3) + dt*h * vel * y[i].dx(0) * q[i].dx(0) * dx(4)            
-                m_0[i, i] =  inner(y[i],q[i])*dx 
-                m_1[i, i] =  h * inner(y[i], q[i].dx(0))*dx(1)
-                m_2[i, i] =  h * inner(y[i], q[i].dx(0))*dx(2)
+                m_0[i, i] =  inner(y[i],q[i])*dx(1)
+                m_1[i, i] =  inner(y[i],q[i])*dx(2) + inner(y[i],q[i])*dx(3) + inner(y[i],q[i])*dx(4)
+                m_2[i, i] =  h * inner(y[i], q[i].dx(0))*dx(1)
+                m_3[i, i] =  h * inner(y[i], q[i].dx(0))*dx(2)
             for i in range(Nt-1):
                 m_0[i+1, i] = - inner(y[i],q[i+1])*dx 
-                m_1[i+1, i] = - h * inner(y[i], q[i+1].dx(0))*dx(1)
-                m_2[i+1, i] = - h * inner(y[i], q[i+1].dx(0))*dx(2)
+                m_1[i+1, i] = - inner(y[i],q[i+1])*dx(2) - inner(y[i],q[i+1])*dx(3) - inner(y[i],q[i+1])*dx(4)
+                m_2[i+1, i] = - h * inner(y[i], q[i+1].dx(0))*dx(1)
+                m_3[i+1, i] = - h * inner(y[i], q[i+1].dx(0))*dx(2)
             a0 = [[0, 0, 0], [0, 0, 0], [a0_0, 0, 0]]
             a1 = [[0, 0, 0], [0, 0, 0], [a1_0, 0, 0]]
             a2 = [[0, 0, 0], [0, 0, 0], [a2_0, 0, 0]]
@@ -175,7 +190,8 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             a7 = [[0, 0, 0], [0, 0, 0], [m_0, 0, 0]]
             a8 = [[0, 0, 0], [0, 0, 0], [m_1, 0, 0]]
             a9 = [[0, 0, 0], [0, 0, 0], [m_2, 0, 0]]
-            return (BlockForm(a0), BlockForm(a1), BlockForm(a2),  BlockForm(a3), BlockForm(a4), BlockForm(a5), BlockForm(a6),  BlockForm(a7), BlockForm(a8), BlockForm(a9))
+            a10 = [[0, 0, 0], [0, 0, 0], [m_3, 0, 0]]
+            return (BlockForm(a0), BlockForm(a1), BlockForm(a2),  BlockForm(a3), BlockForm(a4), BlockForm(a5), BlockForm(a6),  BlockForm(a7), BlockForm(a8), BlockForm(a9), BlockForm(a10))
         elif term == "a*":
             z = self.z
             p = self.p
@@ -191,21 +207,24 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             ms_0 = zeros((Nt, Nt), dtype=object)
             ms_1 = zeros((Nt, Nt), dtype=object)
             ms_2 = zeros((Nt, Nt), dtype=object)
+            ms_3 = zeros((Nt, Nt), dtype=object)
             for i in range(Nt):
                 as0_0[i, i] = dt*inner(grad(z[i]), grad(p[i]))*dx(1)
                 as1_0[i, i] = - dt*vel*p[i].dx(0)*z[i]*dx(1)             
-                as2_0[i, i] = - dt*h * vel * p[i].dx(0) * z[i].dx(0) * dx(2)
-                as3_0[i, i] = - dt * p[i].dx(1) * z[i].dx(1) * dx(2) 
-                as4_0[i, i] = - dt*vel*p[i].dx(0)*z[i]*dx(2) 
+                as2_0[i, i] = - dt*h * p[i].dx(0) * z[i].dx(0) * dx(2) - dt*h  * p[i].dx(0) * z[i].dx(0) * dx(3) - dt*h  * p[i].dx(0) * z[i].dx(0) * dx(4) ###SISTEMARE
+                as3_0[i, i] = - dt * p[i].dx(1) * z[i].dx(1) * dx(2) - dt * p[i].dx(1) * z[i].dx(1) * dx(3) - dt * p[i].dx(1) * z[i].dx(1) * dx(4)  
+                as4_0[i, i] = - dt*vel*p[i].dx(0)*z[i]*dx(2)  - dt*vel*p[i].dx(0)*z[i]*dx(3) - dt*vel*p[i].dx(0)*z[i]*dx(4) 
                 as5_0[i, i] =  dt * h * vel * p[i].dx(0) * z[i].dx(0) * dx(1) 
                 as6_0[i, i] =  dt * h * vel * p[i].dx(0) * z[i].dx(0) * dx(2) + dt* h * vel * z[i].dx(0) * p[i].dx(0) * dx(2) + dt*h * vel * z[i].dx(0) * p[i].dx(0) * dx(3) + dt*h * vel * z[i].dx(0) * p[i].dx(0) * dx(4)  
-                ms_0[i, i] = + inner(z[i],p[i])*dx 
-                ms_1[i, i] = - h * inner(p[i].dx(0), z[i])*dx(1)
-                ms_2[i, i] = - h * inner(p[i].dx(0), z[i])*dx(2)
+                ms_0[i, i] = + inner(z[i],p[i])*dx(1)
+                ms_1[i, i] = + inner(z[i],p[i])*dx(2)  + inner(z[i],p[i])*dx(3)  + inner(z[i],p[i])*dx(4)
+                ms_2[i, i] = - h * inner(p[i].dx(0), z[i])*dx(1)
+                ms_3[i, i] = - h * inner(p[i].dx(0), z[i])*dx(2)
             for i in range(Nt-1):
-                ms_0[i+1, i] = - inner(p[i+1], z[i])*dx
-                ms_1[i+1, i] = + h*inner(p[i+1].dx(0), z[i])*dx(1)
-                ms_2[i+1, i] = + h*inner(p[i+1].dx(0), z[i])*dx(2)
+                ms_0[i+1, i] = - inner(p[i+1], z[i])*dx(1)
+                ms_1[i+1, i] = - inner(p[i+1], z[i])*dx(2) - inner(p[i+1], z[i])*dx(3) - inner(p[i+1], z[i])*dx(4)
+                ms_2[i+1, i] = + h*inner(p[i+1].dx(0), z[i])*dx(1)
+                ms_3[i+1, i] = + h*inner(p[i+1].dx(0), z[i])*dx(2)
             as0 = [[0, 0, as0_0], [0, 0, 0], [0, 0, 0]]
             as1 = [[0, 0, as1_0], [0, 0, 0], [0, 0, 0]]
             as2 = [[0, 0, as2_0], [0, 0, 0], [0, 0, 0]]
@@ -216,7 +235,8 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             as7 = [[0, 0, ms_0], [0, 0, 0], [0, 0, 0]]
             as8 = [[0, 0, ms_1], [0, 0, 0], [0, 0, 0]]
             as9 = [[0, 0, ms_2], [0, 0, 0], [0, 0, 0]]
-            return (BlockForm(as0), BlockForm(as1), BlockForm(as2),  BlockForm(as3), BlockForm(as4), BlockForm(as5), BlockForm(as6),  BlockForm(as7), BlockForm(as8), BlockForm(as9))
+            as10 = [[0, 0, ms_3], [0, 0, 0], [0, 0, 0]]
+            return (BlockForm(as0), BlockForm(as1), BlockForm(as2),  BlockForm(as3), BlockForm(as4), BlockForm(as5), BlockForm(as6),  BlockForm(as7), BlockForm(as8), BlockForm(as9), BlockForm(as10) )
         elif term == "c":
             u = self.u
             q = self.q
@@ -234,7 +254,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             c1 = [[0, 0, 0], [0, 0, 0], [0, c1_0, 0]]
             c2 = [[0, 0, 0], [0, 0, 0], [0, c2_0, 0]]
             c3 = [[0, 0, 0], [0, 0, 0], [0, c3_0, 0]]
-            return(BlockForm(c0),BlockForm(c1),BlockForm(c2))
+            return(BlockForm(c0),BlockForm(c1),BlockForm(c2),BlockForm(c3))
         elif term == "c*":
             v = self.v
             p = self.p
@@ -251,7 +271,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             cs0 = [[0, 0, 0], [0, 0, cs0_0], [0, 0, 0]]
             cs1 = [[0, 0, 0], [0, 0, cs1_0], [0, 0, 0]]
             cs2 = [[0, 0, 0], [0, 0, cs2_0], [0, 0, 0]]
-            cs2 = [[0, 0, 0], [0, 0, cs3_0], [0, 0, 0]]
+            cs3 = [[0, 0, 0], [0, 0, cs3_0], [0, 0, 0]]
             return(BlockForm(cs0),BlockForm(cs1), BlockForm(cs2), BlockForm(cs3))
         elif term == "m":
             y = self.y
@@ -281,7 +301,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
                 n1_0[i,i] = dt*inner(u[i], v[i])*dx(2)+ dt*inner(u[i], v[i])*dx(3)+ dt*inner(u[i], v[i])*dx(4) #*ds(2)
             n0 = [[0, 0, 0], [0, n0_0, 0], [0, 0, 0]]
             n1 = [[0, 0, 0], [0, n1_0, 0], [0, 0, 0]]
-            return (BlockForm(n0),)
+            return (BlockForm(n0),BlockForm(n1))
         elif term == "f":
             q = self.q
             y_0 = self.y_0
@@ -371,8 +391,8 @@ boundaries = MeshFunction("size_t", mesh, "data/graetzOC_h_0.020_facet_region.xm
 print("hMax: ", mesh.hmax() )
 
 # 2 Create Finite Element space (Lagrange P1)
-T = 0.5
-dt = 0.125
+T = 1.6
+dt = 0.4
 Nt = int(ceil(T/dt))
 
 # BOUNDARY RESTRICTIONS #

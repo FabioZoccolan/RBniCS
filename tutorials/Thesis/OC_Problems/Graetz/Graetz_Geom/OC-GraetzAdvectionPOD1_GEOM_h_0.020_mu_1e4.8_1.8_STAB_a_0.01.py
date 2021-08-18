@@ -9,7 +9,7 @@ For this problem the affine decomposition is straightforward.
 """
 
 @OnlineStabilization()
-@PullBackFormsToReferenceDomain()
+#@PullBackFormsToReferenceDomain()
 @ShapeParametrization(
     ("x[0]", "x[1]"), # subdomain 1
     ("mu[1]*(x[0] - 1) + 1", "x[1]"), # subdomain 2
