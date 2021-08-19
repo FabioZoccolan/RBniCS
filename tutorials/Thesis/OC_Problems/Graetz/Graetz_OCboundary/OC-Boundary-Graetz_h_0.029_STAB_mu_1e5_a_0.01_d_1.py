@@ -47,7 +47,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         self.ds = Measure("ds")(subdomain_data=boundaries)
         
         # Regularization coefficient
-        self.alpha = 0.01
+        self.alpha = 0.0001
         self.y_d = Constant(1.0)
         
         # Store the velocity expression
@@ -124,6 +124,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
     def assemble_operator(self, term):
         print(term)
         dx = self.dx
+        ds = self.ds
         if term == "a":
             y = self.y
             q = self.q
@@ -156,8 +157,8 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             u = self.u
             q = self.q
             h = self.h
-            c0_0 = u*q*ds(0)
-            c1_0 = h * u * q.dx(0) * ds(0)
+            c0_0 = u*q*ds(7)
+            c1_0 = h * u * q.dx(0) * ds(7)
             c0 = [[0, 0, 0], [0, 0, 0], [0, c0_0, 0]]
             c1 = [[0, 0, 0], [0, 0, 0], [0, c1_0, 0]]
             return(BlockForm(c0),BlockForm(c1))
@@ -165,8 +166,8 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             v = self.v
             p = self.p
             h = self.h
-            cs0_0 = p*v*ds(0)
-            cs1_0 = Constant(0.0) * - h * v.dx(0) * p * ds(0)
+            cs0_0 = p*v*ds(7)
+            cs1_0 = Constant(0.0) * - h * v.dx(0) * p * ds(7)
             cs0 = [[0, 0, 0], [0, 0, cs0_0], [0, 0, 0]]
             cs1 = [[0, 0, 0], [0, 0, cs1_0], [0, 0, 0]]
             return(BlockForm(cs0),BlockForm(cs1))
@@ -174,8 +175,8 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             y = self.y
             z = self.z
             h = self.h
-            m0_0 = y * z *dx
-            m1_0 = -h * y * z.dx(0) * dx
+            m0_0 =  y * z *dx(3) + y * z *dx(4)
+            m1_0 = -h * y * z.dx(0) * dx(4)-h * y * z.dx(0) * dx(3)
             m0 = [[m0_0, 0, 0], [0, 0, 0], [0, 0, 0]]
             m1 = [[m1_0, 0, 0], [0, 0, 0], [0, 0, 0]]
             return (BlockForm(m0),BlockForm(m1))
@@ -183,7 +184,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             u = self.u
             v = self.v
             h = self.h
-            n0_0 = u*v*ds(0)
+            n0_0 = u*v*ds(7)
             n0 = [[0, 0, 0], [0, n0_0, 0], [0, 0, 0]]
             return (BlockForm(n0),)
         elif term == "f":
@@ -228,7 +229,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         elif term == "inner_product_u":
             u = self.u
             v = self.v
-            x0_u = u* v *ds
+            x0_u = u* v *ds(7)
             x0 = [[0, 0, 0], [0, x0_u, 0], [0, 0, 0]]
             return (BlockForm(x0),)
         elif term == "inner_product_p":
@@ -261,10 +262,9 @@ p_restrict.append(None)
    
 # FUNCTION SPACES #
 scalar_element = FiniteElement("Lagrange", mesh.ufl_cell(), 1)
-real_element = FiniteElement("Lagrange", mesh.ufl_cell(),1)
-element = BlockElement([scalar_element] + [real_element] + [scalar_element])
+element = BlockElement([scalar_element] + [scalar_element] + [scalar_element])
 components = ["y"]+ ["u"] + ["p"]
-block_V = BlockFunctionSpace(mesh, element, restrict = [*y_restrict, *u_restrict, *p_restrict], components=[*components])
+block_V = BlockFunctionSpace(mesh, element,  restrict = [*y_restrict, *u_restrict, *p_restrict] , components=[*components])
 print("Dim: ", block_V.dim() )
 
 
