@@ -8,7 +8,7 @@ from abc import ABCMeta, abstractmethod
 
 
 class Distribution(object, metaclass=ABCMeta):
-    @abstractmethod
+    @abstractmethod      #decorator for abstract method
     def sample(self, box, n):
         raise NotImplementedError("The method sample is distribution-specific and needs to be overridden.")
 
