@@ -28,10 +28,11 @@ from rbnics.utils.mpi import parallel_io as parallel_generate, parallel_max
 
 class ParameterSpaceSubset(ExportableList): # equivalent to a list of tuples
     def __init__(self):
+        print("In ParameterSpaceSubset __init__")
         ExportableList.__init__(self, "text")
         self.mpi_comm = COMM_WORLD
         self.distributed_max = True
-        
+        self.weight = ExportableList("text")
     @overload
     def __getitem__(self, key: int):
         return self._list[key]
@@ -44,19 +45,75 @@ class ParameterSpaceSubset(ExportableList): # equivalent to a list of tuples
         return output
     
     # Method for generation of parameter space subsets
-    def generate(self, box, n, sampling=None):
+    def generate(self, box, n, sampling=None,typeGrid=0, order_flag=False): # typeGrid=0, order_flag=False):
+        print("In ParameterSpaceSubset.generate")
+        print("ParameterSpaceSubset.generate::is_tuple(sampling)=", isinstance(sampling,tuple))
         if len(box) > 0:
             if sampling is None:
                 sampling = UniformDistribution()
+                # Sampling_Unspecified
             elif isinstance(sampling, tuple):
                 assert len(sampling) == len(box)
                 sampling = CompositeDistribution(sampling)
-            def run_sampling():
-                return sampling.sample(box, n)
-            self._list = parallel_generate(run_sampling, self.mpi_comm)
+            def run_sampling(): # HERE WE GENERATE THE SAMPLE!!   
+                print("ParameterSpaceSubset.generate::now calling compositeDistribution.sample")
+                return sampling.sample(box, n, typeGrid, order_flag)
+            print("ParameterSpaceSubset.generate::here typegrid is", typeGrid)
+            if typeGrid != 0:
+                print("I am now in param_space_subset.generate() for typgrid!=0")
+                print("run_sampling=", run_sampling)
+                self._list, weight = parallel_generate(run_sampling, self.mpi_comm)
+                '''
+                print("the weights have been assigned succesfully")
+                import numpy as np
+                import matplotlib.pyplot as plt
+                from mpl_toolkits.mplot3d import Axes3D
+                x=np.ones(len(self._list))
+                y=np.ones(len(self._list))
+                #z=np.ones(len(self._list))
+                for i in range(len(self._list)):
+                    x[i] = self._list[i][0]
+                    y[i] = self._list[i][1]
+
+                fig = plt.figure()
+                ax = fig.add_subplot(111)
+
+                ax.scatter(x,y,c='r', marker='o')
+
+                ax.set_xlabel('X Label')
+                ax.set_ylabel('Y Label')
+                plt.show()  
+                import sys
+                sys.exit()
+                '''
+                self.weight.extend(weight)
+            else:
+                self._list = parallel_generate(run_sampling, self.mpi_comm)
+                """import numpy as np
+                import matplotlib.pyplot as plt
+                x=np.ones(len(self._list))
+                y=np.ones(len(self._list))
+                #z=np.ones(len(self._list))
+                for i in range(len(self._list)):
+                    x[i] = self._list[i][0]
+                    y[i] = self._list[i][1]
+                fig = plt.figure()
+                ax = fig.add_subplot(111)
+
+                ax.scatter(x, y, c='r', marker='o')
+
+                ax.set_xlabel('X Label')
+                ax.set_ylabel('Y Label')
+                plt.show()
+                import sys
+                sys.exit() """
+                
+            # _list ha [i][j] dove sulla prima riga ha la tupla di parametri e sulla seconda quella di pesi associati
+            print("\n\n\nnumero parametri:" ,len(self._list),"\n\n")
         else:
             for i in range(n):
                 self._list.append(tuple())
+        print("ParamaterSpaceSubset.generate::DONE")
         
     def max(self, generator, postprocessor=None):
         if postprocessor is None:
@@ -115,3 +172,14 @@ class ParameterSpaceSubset(ExportableList): # equivalent to a list of tuples
         parameters_and_distances.sort(key=operator.itemgetter(1))
         output._list = [xi_i for (xi_i, _) in parameters_and_distances[:M]]
         return output
+        
+    def save(self, directory, filename, typeGrid=0):
+        print("There is something to save:", not ( not self.weight) )
+        ExportableList.save(self, directory, filename)
+        if typeGrid != 0:
+            self.weight.save(directory, filename + "_weight")
+    
+    def load(self, directory, filename, typeGrid=0):
+        ExportableList.load(self, directory, filename)
+        if typeGrid != 0:
+            self.weight.load(directory, filename + "_weight")

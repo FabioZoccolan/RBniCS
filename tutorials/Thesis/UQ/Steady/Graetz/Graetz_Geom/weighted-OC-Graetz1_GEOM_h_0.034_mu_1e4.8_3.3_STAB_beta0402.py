@@ -10,6 +10,13 @@ from sampling.weights import *
 
 @WeightedUncertaintyQuantification()
 @OnlineStabilization()
+#@PullBackFormsToReferenceDomain()
+@ShapeParametrization(
+    ("x[0]", "x[1]"), # subdomain 1
+    ("mu[1]*(x[0] - 1) + 1", "x[1]"), # subdomain 2
+    ("mu[1]*(x[0] - 1) + 1", "x[1]"), # subdomain 3
+    ("mu[1]*(x[0] - 1) + 1", "x[1]"), # subdomain 4
+)
 class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Default initialization of members
@@ -36,7 +43,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         
         # Store the velocity expression
         self.vel = Expression("x[1] * (1 - x[1])", element=self.V.sub(0).ufl_element())
-        self.lifting = Expression('((x[0] >= 1 && x[0] <= 2) && (x[1] == 1.0 || x[1]== 0.0) ) ? 1. : 0.', degree=1, domain=mesh)
+        #self.lifting = Expression('((x[0] >= 1 && x[0] <= 2) && (x[1] == 1.0 || x[1]== 0.0) ) ? 1. : 0.', degree=1, domain=mesh)
         # Customize linear solver parameters
         self._linear_solver_parameters.update({
             "linear_solver": "mumps"
@@ -44,60 +51,65 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Return custom problem name
     def name(self):
-        return "UQ_OCGraetzPOD1_h_0.029_STAB_mu_1e5_alpha_0.01_beta7575"
+        return "UQ_OCGraetzPOD1_GEOM_STAB_h_0.034_mu_1e4.8_3.3_alpha_0.01_beta0402"
 
-    # Return theta multiplicative terms of the affine expansion of the problem.
-    
+      # Return theta multiplicative terms of the affine expansion of the problem.
     def compute_theta(self, term):
         mu = self.mu
+        delta = self.delta
         if term in ("a", "a*"):
             theta_a0 = 1/(mu[0])
             theta_a1 = 4.0
-            if self.stabilized:
-              delta = self.delta
-              theta_a2 = delta * 4.0
-              theta_a3 = delta * 4.0
-            else:
-              theta_a2 = 0.0
-              theta_a3 = 0.0
-            return (theta_a0, theta_a1, theta_a2, theta_a3)
-        elif term in ("c", "c*"):
-            theta_c0 = 1.0
-            if self.stabilized:
-               delta = self.delta
-               theta_c1 = delta
-            else:
-               theta_c1 = 0.0
-            return (theta_c0,theta_c1)
-        elif term == "m":
-            theta_m0 = 1.0
+            theta_a2 = 1/(mu[0]*mu[1])
+            theta_a3 = (mu[1])/(mu[0])
+            theta_a4 = 4.0
             if self.stabilized:
                 delta = self.delta
-                theta_m1 = delta
+                theta_a5 = delta * 4.0
+                theta_a6 = delta * (4.0)/(sqrt(mu[1]))
             else:
-                theta_m1 = 0.0
-            return (theta_m0, theta_m1)
+                theta_a5 = 0.0
+                theta_a6 = 0.0
+            return (theta_a0, theta_a1, theta_a2, theta_a3, theta_a4, theta_a5, theta_a6)
+        elif term in ("c", "c*"):
+            theta_c0 = 1.0 
+            theta_c1 = mu[1]
+            if self.stabilized:
+               delta = self.delta
+               theta_c2 = delta * 1.0
+               theta_c3 = delta *(1.0)/(sqrt(mu[1]))
+            else:
+               theta_c2 = 0.0
+               theta_c3 = 0.0
+            return (theta_c0,theta_c1, theta_c2, theta_c3 )
+        elif term == "m":
+            theta_m0 = 1.0
+            theta_m1 = mu[1]
+            if self.stabilized:
+                delta = self.delta
+                theta_m2 = delta * 1.0
+                theta_m3 = delta * (1.0)/(sqrt(mu[1]))
+            else:
+                theta_m2 = 0.0
+                theta_m3 = 0.0
+            return (theta_m0, theta_m1, theta_m2, theta_m3)
         elif term == "n":
             theta_n0 = self.alpha
-            if self.stabilized:
-              delta = self.delta
-              theta_n1 = 0.0 #delta * self.alpha
-            else:
-               theta_n1 = 0.0
-            return (theta_n0, theta_n1)
+            theta_n1= self.alpha * mu[1]
+            return (theta_n0,theta_n1)
         elif term == "f":
             theta_f0 = 0.0
             return (theta_f0, )
         elif term == "g":
-            theta_g0 = 1.
+            theta_g0 = mu[1]
             if self.stabilized:
-               delta = self.delta
-               theta_g1 = delta
+                delta = self.delta
+                theta_g1 = delta *(1.0)/(sqrt(mu[1]))
             else:
-               theta_g1 = 0.0
+                theta_g1 = 0.0
             return (theta_g0, theta_g1)
         elif term == "h":
-            theta_h0 = 1.
+            theta_h0 = mu[1]
             return (theta_h0,)
         elif term == "dirichlet_bc_y":
             theta_bc0 = 1.
@@ -106,7 +118,6 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             raise ValueError("Invalid term for compute_theta().")
 
     # Return forms resulting from the discretization of the affine expansion of the problem operators.
-    
     def assemble_operator(self, term):
         print(term)
         dx = self.dx
@@ -115,50 +126,60 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             q = self.q
             vel = self.vel
             h = self.h
-            a0 = inner(grad(y), grad(q)) * dx
-            a1 = vel * y.dx(0) * q * dx
-            a2 = h * vel * y.dx(0) * q.dx(0) * dx(1)
-            a3 = h * vel * y.dx(0) * q.dx(0) * dx(2)+ h * vel * y.dx(0) * q.dx(0) * dx(3)+h * vel * y.dx(0) * q.dx(0) * dx(4) #in case, take all the domain
-            return (a0, a1, a2, a3)
+            a0 = inner(grad(y), grad(q)) * dx(1)
+            a1 = vel * y.dx(0) * q * dx(1)
+            a2 = y.dx(0) * q.dx(0) * dx(2) + y.dx(0) * q.dx(0) * dx(3) + y.dx(0) * q.dx(0) * dx(4)
+            a3 = y.dx(1) * q.dx(1) * dx(2) + y.dx(1) * q.dx(1) * dx(3) + y.dx(1) * q.dx(1) * dx(4)
+            a4 = vel * y.dx(0) * q * dx(2) + vel * y.dx(0) * q * dx(3) + vel * y.dx(0) * q * dx(4)
+            a5 = h * vel * y.dx(0) * q.dx(0) * dx(1) #in case, take all the domain
+            a6 = h * vel * y.dx(0) * q.dx(0) * dx(2) + h * vel * y.dx(0) * q.dx(0) * dx(3) + h * vel * y.dx(0) * q.dx(0) * dx(4)
+            return (a0, a1, a2, a3, a4, a5, a6)
         elif term == "a*":
             z = self.z
             p = self.p
-            vel = self.vel    
+            vel = self.vel
             h = self.h
-            as0 = inner(grad(z), grad(p)) * dx
-            as1 = -vel * p.dx(0) * z * dx
-            as2 = h * vel * p.dx(0) * z.dx(0) * dx(1)
-            as3 = h * vel * p.dx(0) * z.dx(0) * dx(2) + h * vel * p.dx(0) * z.dx(0) * dx(3) + h * vel * p.dx(0) * z.dx(0) * dx(4)
-            return (as0, as1, as2, as3)
+            as0 = inner(grad(z), grad(p)) * dx(1)
+            as1 = -vel * p.dx(0) * z * dx(1)
+            as2 = - p.dx(0) * z.dx(0) * dx(2) - p.dx(0) * z.dx(0) * dx(3) - p.dx(0) * z.dx(0) * dx(4)
+            as3 = - p.dx(1) * z.dx(1) * dx(2) - p.dx(1) * z.dx(1) * dx(3) - p.dx(1) * z.dx(1) * dx(4)
+            as4 = - vel * p.dx(0) * z * dx(2) - vel * p.dx(0) * z * dx(3) - vel * p.dx(0) * z * dx(4)
+            as5 = h * vel * p.dx(0) * z.dx(0) * dx(1) #in case, take all the domain
+            as6 = h * vel * p.dx(0) * z.dx(0) * dx(2) + h * vel * p.dx(0) * z.dx(0) * dx(3) + h * vel * p.dx(0) * z.dx(0) * dx(4)
+            return (as0, as1, as2, as3, as4, as5, as6)
         elif term == "c":
             u = self.u
             q = self.q
             h = self.h
-            c0 = u * q * dx
-            c1 = h * u * q.dx(0) * dx
-            return (c0,c1)
+            c0 = u * q * dx(1)
+            c1 = u * q * dx(2) + u * q * dx(3) + u * q * dx(4)
+            c2 = h * u * q.dx(0) * dx(1)
+            c3 = h * u * q.dx(0) * dx(2) + h * u * q.dx(0) * dx(3) + h * u * q.dx(0) * dx(4)
+            return (c0,c1,c2,c3)
         elif term == "c*":
             v = self.v
             p = self.p
             h = self.h
-            cs0 = v * p * dx
-            cs1 = Constant(0.0) * - h * v.dx(0) * p * dx # Constant(0.0) 
-            return (cs0,cs1)
+            cs0 = v * p * dx(1)
+            cs1 = v * p * dx(2) + v * p * dx(3) + v * p * dx(4)
+            cs2 = Constant(0.0) * - h * v.dx(0) * p * dx
+            cs3 = Constant(0.0) * - h * v.dx(0) * p * dx
+            return (cs0,cs1,cs2, cs3)
         elif term == "m":
             y = self.y
             z = self.z
             h = self.h
-            m0 = y * z * dx
-            m0 = y * z * dx#(3) + y * z * dx(4)
-            m1 = -h * y * z.dx(0) * dx#(3) - h * y * z.dx(0) * dx(4)
-            return (m0,m1)
+            m0 = y * z * dx(1)
+            m1 = y * z * dx(2) + y * z * dx(3) + y * z * dx(4)
+            m2 = - h * y * z.dx(0) * dx(1)
+            m3 = - h * y * z.dx(0) * dx(2) - h * y * z.dx(0) * dx(3) - h * y * z.dx(0) * dx(4) 
+            return (m0,m1,m2,m3)
         elif term == "n":
             u = self.u
             v = self.v
-            h = self.h
-            n0 = u * v * dx
-            n1 = -h * u * v.dx(0) * dx
-            return (n0,n1)
+            n0 = u * v * dx(1)
+            n1 = u * v * dx(2) + u * v * dx(3) + u * v * dx(4)
+            return (n0, n1)
         elif term == "f":
             q = self.q
             f0 = Constant(0.0) * q * dx
@@ -214,9 +235,9 @@ The mesh was generated by the [data/generate_mesh_2.ipynb](https://colab.researc
 ) notebook.
 """
 
-mesh = Mesh("data/graetzOC_h_0.029.xml")
-subdomains = MeshFunction("size_t", mesh, "data/graetzOC_h_0.029_physical_region.xml")
-boundaries = MeshFunction("size_t", mesh, "data/graetzOC_h_0.029_facet_region.xml")
+mesh = Mesh("data/graetzOC_h_0.034.xml")
+subdomains = MeshFunction("size_t", mesh, "data/graetzOC_h_0.034_physical_region.xml")
+boundaries = MeshFunction("size_t", mesh, "data/graetzOC_h_0.034_facet_region.xml")
 print("hMax: ", mesh.hmax() )
 
 
@@ -232,8 +253,8 @@ print("Dim: ", V.dim() )
 problem = EllipticOptimalControl(V, subdomains=subdomains, boundaries=boundaries)
 mu_range = [(0.01, 1e6), (0.5, 4.0)]
 problem.set_mu_range(mu_range)
-beta_a = [75 for _ in range(2)]
-beta_b = [75 for _ in range(2)]
+beta_a = [4 for _ in range(2)]
+beta_b = [2 for _ in range(2)]
 
 # ### 4.4. Prepare reduction with a reduced basis method
 
@@ -242,18 +263,17 @@ beta_b = [75 for _ in range(2)]
 pod_galerkin_method = PODGalerkin(problem)
 pod_galerkin_method.set_Nmax(20)
 
-#Offline Phase
+##Offline Phase
 
-pod_galerkin_method.initialize_training_set(100, sampling=BetaDistribution(beta_a, beta_b),typeGrid=2) 
+pod_galerkin_method.initialize_training_set(100, sampling=BetaDistribution(beta_a, beta_b), weight=BetaWeight(beta_a, beta_b),typeGrid=2) 
 reduced_elliptic_optimal_control = pod_galerkin_method.offline()
 
 
-offline_mu = (1e5, 1.2)
+offline_mu = (10**4.8, 3.3)
 #problem.init()
 problem.set_mu(offline_mu)
 problem.solve()
-problem.export_solution(filename="FEM_UQ_OCGraetz1_h_0.029_STAB_mu_1e5_alpha_0.01_beta7575")
-
+problem.export_solution(filename="FEM_UQ_OCGraetz1_GEOM_STAB_h_0.034_mu_1e4.8_3.3_alpha_0.01_beta0402")
 print("Full order output for mu =", offline_mu, "is", problem.compute_output())
 
 # ### 4.5. Perform the offline phase
@@ -261,7 +281,7 @@ print("Full order output for mu =", offline_mu, "is", problem.compute_output())
 # In[ ]:
 
 
-#lifting_mu = (1e5, 1.2)
+#lifting_mu = (10**4.8, 3.3)
 #problem.set_mu(lifting_mu)
 
 
@@ -270,11 +290,11 @@ print("Full order output for mu =", offline_mu, "is", problem.compute_output())
 # In[ ]:
 
 
-online_mu = (1e5, 1.2)
+online_mu = (10**4.8, 3.3)
 reduced_elliptic_optimal_control.set_mu(online_mu)
-reduced_solution = reduced_elliptic_optimal_control.solve(online_stabilization=True) #online_stabilization=True
+reduced_solution = reduced_elliptic_optimal_control.solve() #online_stabilization=True)
 print("Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
-reduced_elliptic_optimal_control.export_solution(filename="online_solution_UQ_OCGraetz1_h_0.029_STAB_mu_1e5_alpha_0.01_beta7575")
+reduced_elliptic_optimal_control.export_solution(filename="online_solution_UQ_OCGraetz1_GEOM_STAB_h_0.034_mu_1e4.8_3.3_alpha_0.01_beta0402")
 
 # ### 4.7. Perform an error analysis
 
@@ -290,8 +310,6 @@ pod_galerkin_method.error_analysis()
 # In[ ]:
 
 pod_galerkin_method.speedup_analysis()
-
-
 
 
 

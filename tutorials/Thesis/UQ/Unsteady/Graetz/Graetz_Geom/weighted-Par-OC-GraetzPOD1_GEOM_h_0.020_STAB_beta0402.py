@@ -60,7 +60,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Return custom problem name
     def name(self):
-        return "UQ_Parabolic_OCGraetzPOD1_GEOM_h_0.020_STAB_mu_1e4.8_3.3_alpha_0.01_d_1"
+        return "UQ_Par_OCGraetzPOD1_GEOM_h_0.020_STAB_mu_1e4.8_3.3_alpha_0.01_d_1_beta0402"
 
 
     # Return theta multiplicative terms of the affine expansion of the problem.
@@ -420,8 +420,8 @@ print("Dim: ", block_V.dim() )
 elliptic_optimal_control = EllipticOptimalControl(block_V, subdomains=subdomains, boundaries=boundaries, T=T, dt=dt, Nt=Nt)
 mu_range =  [(0.01, 1e6), (0.5, 4.0)]
 elliptic_optimal_control.set_mu_range(mu_range)
-beta_a = [75 for _ in range(2)]
-beta_b = [75 for _ in range(2)]
+beta_a = [4 for _ in range(2)]
+beta_b = [2 for _ in range(2)]
 
 pod_galerkin_method = PODGalerkin(elliptic_optimal_control)
 pod_galerkin_method.set_Nmax(3)
@@ -436,7 +436,7 @@ offline_mu =  (10**4.8, 3.3)
 elliptic_optimal_control.init()
 elliptic_optimal_control.set_mu(offline_mu)
 elliptic_optimal_control.solve()
-elliptic_optimal_control.export_solution(filename="FEM_Par_UQ_OCGraetz1_GEOM_h_0.020_STAB_mu_1e5_alpha_0.01")
+elliptic_optimal_control.export_solution(filename="FEM_Par_UQ_OCGraetz1_GEOM_h_0.020_STAB_mu_1e5_alpha_0.01_beta0402")
 
 print("Full order output for mu =", offline_mu, "is", elliptic_optimal_control.compute_output())
 
@@ -449,9 +449,9 @@ print("Full order output for mu =", offline_mu, "is", elliptic_optimal_control.c
 
 online_mu =  (10**4.8, 3.3)
 reduced_elliptic_optimal_control.set_mu(online_mu)
-reduced_solution = reduced_elliptic_optimal_control.solve(online_stabilization=True)
+reduced_solution = reduced_elliptic_optimal_control.solve() #online_stabilization=True)
 print("Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
-reduced_elliptic_optimal_control.export_solution(filename="online_solution_Par_UQ_OCGraetz1_GEOM_STAB_h_0.020_mu_1e5_alpha_0.01")
+reduced_elliptic_optimal_control.export_solution(filename="online_solution_Par_UQ_OCGraetz1_GEOM_STAB_h_0.020_mu_1e5_alpha_0.01_beta0402")
 
 # In[ ]:
 

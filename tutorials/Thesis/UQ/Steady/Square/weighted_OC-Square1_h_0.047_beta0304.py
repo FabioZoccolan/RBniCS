@@ -46,7 +46,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Return custom problem name
     def name(self):
-        return "UQ_OCSquare1_h_0.047_STAB_mu_2.4_1.2_alpha_0.01_d_2.1"
+        return "UQ_OCSquare1_h_0.047_STAB_mu_2.4_1.2_alpha_0.01_d_2.1_beta0304"
         
     # Return theta multiplicative terms of the affine expansion of the problem.
     def compute_theta(self, term):
@@ -247,8 +247,8 @@ print("Dim: ", V.dim() )
 problem = EllipticOptimalControl(V, subdomains=subdomains, boundaries=boundaries)
 mu_range = [(1e4,5e5), (0.01, 6.3)]
 problem.set_mu_range(mu_range)
-beta_a = [75 for _ in range(2)]
-beta_b = [75 for _ in range(2)]
+beta_a = [3 for _ in range(2)]
+beta_b = [4 for _ in range(2)]
 
 
 
@@ -261,7 +261,7 @@ pod_galerkin_method.set_Nmax(20)
 
 ##Offline Phase
 
-pod_galerkin_method.initialize_training_set(100, sampling=(BetaDistribution(beta_a, beta_b)),typeGrid=2) 
+pod_galerkin_method.initialize_training_set(100, sampling=(BetaDistribution(beta_a, beta_b)),weight=BetaWeight(beta_a, beta_b),typeGrid=2) 
 reduced_elliptic_optimal_control = pod_galerkin_method.offline()
 
 
@@ -269,7 +269,7 @@ offline_mu = (2e4, 1.2)
 #problem.init()
 problem.set_mu(offline_mu)
 problem.solve()
-problem.export_solution(filename="FEM_UQ_OC_Square1_h_0.047_STAB_mu_2.4_1.2_alpha_0.01_beta7575")
+problem.export_solution(filename="FEM_UQ_OC_Square1_h_0.047_STAB_mu_2.4_1.2_alpha_0.01_beta0304")
 
 print("Full order output for mu =", offline_mu, "is", problem.compute_output())
 
@@ -289,7 +289,7 @@ online_mu = (2e4, 1.2)
 reduced_elliptic_optimal_control.set_mu(online_mu)
 reduced_solution = reduced_elliptic_optimal_control.solve()
 print("Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
-reduced_elliptic_optimal_control.export_solution(filename="online_solution_UQ_OC_Square1_h_0.047_STAB_mu_2.4_1.2_alpha_0.01_beta7575")
+reduced_elliptic_optimal_control.export_solution(filename="online_solution_UQ_OC_Square1_h_0.047_STAB_mu_2.4_1.2_alpha_0.01_beta0304")
 # ### 4.7. Perform an error analysis
 
 # In[ ]:

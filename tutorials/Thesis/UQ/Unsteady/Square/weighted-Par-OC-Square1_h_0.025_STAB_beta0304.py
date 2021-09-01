@@ -58,7 +58,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Return custom problem name
     def name(self):
-        return "Parabolic_UQ_OCSquarePOD1_h_0.025_STAB_mu_2e4_1.2_alpha_0.01_d_2.1_beta7575"
+        return "UQ_Par_OCSquarePOD1_h_0.025_STAB_mu_2e4_1.2_alpha_0.01_d_2.1_beta0304"
 
 
     # Return theta multiplicative terms of the affine expansion of the problem.
@@ -382,8 +382,8 @@ print("Dim: ", block_V.dim() )
 elliptic_optimal_control = EllipticOptimalControl(block_V, subdomains=subdomains, boundaries=boundaries, T=T, dt=dt, Nt=Nt)
 mu_range =  [(1e4,5e5), (0.01, 6.3)]
 elliptic_optimal_control.set_mu_range(mu_range)
-beta_a = [75 for _ in range(2)]
-beta_b = [75 for _ in range(2)]
+beta_a = [3 for _ in range(2)]
+beta_b = [4 for _ in range(2)]
 
 pod_galerkin_method = PODGalerkin(elliptic_optimal_control)
 pod_galerkin_method.set_Nmax(3)
@@ -400,7 +400,7 @@ offline_mu = (2e4, 1.2)
 elliptic_optimal_control.init()
 elliptic_optimal_control.set_mu(offline_mu)
 elliptic_optimal_control.solve()
-elliptic_optimal_control.export_solution(filename="FEM_Par_UQ_OCSquare1_h_0.025_STAB_mu_2e4_1.2_alpha_0.01_d_2.1_beta7575")
+elliptic_optimal_control.export_solution(filename="FEM_Par_UQ_OCSquare1_h_0.025_STAB_mu_2e4_1.2_alpha_0.01_d_2.1_beta0304")
 
 
 
@@ -417,7 +417,7 @@ online_mu = (2e4, 1.2)
 reduced_elliptic_optimal_control.set_mu(online_mu)
 reduced_solution = reduced_elliptic_optimal_control.solve(online_stabilization=True)
 print("Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
-reduced_elliptic_optimal_control.export_solution(filename="online_solution_Par_UQ_OCSquare1_STAB_h_0.025_mu_2e4_1.2_alpha_0.01_d_2.1_beta7575")
+reduced_elliptic_optimal_control.export_solution(filename="online_solution_Par_UQ_OCSquare1_STAB_h_0.025_mu_2e4_1.2_alpha_0.01_d_2.1_beta0304")
 
 # In[ ]:
 
