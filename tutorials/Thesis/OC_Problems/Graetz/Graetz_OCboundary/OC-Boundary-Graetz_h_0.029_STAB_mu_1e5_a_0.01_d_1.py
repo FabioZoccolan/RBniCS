@@ -270,10 +270,10 @@ print("Dim: ", block_V.dim() )
 
 # 3. Allocate an object of the EllipticOptimalControl class
 elliptic_optimal_control = EllipticOptimalControl(block_V, subdomains=subdomains, boundaries=boundaries)
-mu_range =  [(0.01, 1e6), (0.5, 4.0)]
+mu_range =  [(1e3, 1e6)]
 elliptic_optimal_control.set_mu_range(mu_range)
 
-offline_mu = (1e5, 1.0)
+offline_mu = (1e4,)
 elliptic_optimal_control.init()
 elliptic_optimal_control.set_mu(offline_mu)
 elliptic_optimal_control.solve()
@@ -286,16 +286,16 @@ elliptic_optimal_control.export_solution(filename="BoundaryFEM_OCGraetz_h_0.029_
 # In[ ]:
 
 pod_galerkin_method = PODGalerkin(elliptic_optimal_control)
-pod_galerkin_method.set_Nmax(3)
+pod_galerkin_method.set_Nmax(20)
 
 # ### 4.5. Perform the offline phase
 
 # In[ ]:
 
 
-lifting_mu = (1e5, 1.0)
-elliptic_optimal_control.set_mu(lifting_mu)
-pod_galerkin_method.initialize_training_set(5)
+#lifting_mu = (1e5, 1.0)
+#elliptic_optimal_control.set_mu(lifting_mu)
+pod_galerkin_method.initialize_training_set(100)
 reduced_elliptic_optimal_control = pod_galerkin_method.offline()
 
 
@@ -304,7 +304,7 @@ reduced_elliptic_optimal_control = pod_galerkin_method.offline()
 # In[ ]:
 
 
-online_mu = (1e5, 1.0)
+online_mu = (1e5,)
 reduced_elliptic_optimal_control.set_mu(online_mu)
 reduced_solution = reduced_elliptic_optimal_control.solve()
 print("Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
