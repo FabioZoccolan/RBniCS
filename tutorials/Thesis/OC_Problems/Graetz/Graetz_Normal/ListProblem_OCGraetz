@@ -6,7 +6,7 @@ ALL FILES USE POD-GALERKIN, NOT RB
 
 OC-GRAETZADVECTIONPOD1 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, yd = 0 in tutto il resto del dominio) BC2= 0.0 ON 1,5,6
 
-N = 9360 (dim FEM) h = 0.040 (max diam mesh)
+N = 9360 (dim FEM) h = 0.040 (max diam mesh) 
 
 file .py OC-GraetzAdvectionPOD1_h_0.040_mu_6.0_a_0.01
 AdvectionOCGraetzPOD1_h_0.040_mu_6.0_alpha_0.01 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, yd = 0 in tutto il resto del dominio), mu = 6.0, alpha = 0.01
@@ -47,13 +47,13 @@ AdvectionOCGraetzPOD1_h_0.040_STAB_mu_1e5_alpha_0.01 = (yd = 1 nei due rettangol
 N = 18798 (dim FEM) h = 0.029 (max diam mesh)
 
 file .py OC-GraetzAdvectionPOD1_h_0.029_mu_2e3_a_0.1   con questo mu inizia ad essere non stabile
-AdvectionOCGraetzPOD1_h_0.029_mu_2e3_alpha_0.1 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, tutto il resto del dominio libero), mu = 2e3, alpha = 0.1
+AdvectionOCGraetzPOD1_h_0.029_mu_2e3_alpha_0.1 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, tutto il resto del dominio libero), mu = 2e3, alpha = 0.1 mu_range=(1e3,1e6)
 
 file .py OC-GraetzAdvectionPOD1_h_0.029_mu_1e5_a_0.01
 AdvectionOCGraetzPOD1_h_0.029_mu_1e5_alpha_0.01 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, yd = 0 in tutto il resto del dominio), mu = 1e5, alpha = 0.01
 
 file .py OC-GraetzAdvectionPOD1_h_0.029_STAB_mu_1e4_a_0.01_d_1
-AdvectionOCGraetzPOD1_h_0.029_STAB_mu_1e4_alpha_0.01 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, yd = 0 in tutto il resto del dominio), mu = 1e4, alpha = 0.01, state stab delta=1.0
+AdvectionOCGraetzPOD1_h_0.029_STAB_mu_1e4_alpha_0.01 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, yd = 0 in tutto il resto del dominio), mu = 1e4, alpha = 0.01, state stab delta=1.0  mu_range=(1e3,1e6)
 
 file .py OC-GraetzAdvectionPOD1_h_0.029_STAB_mu_1e5_a_0.01_d_1
 AdvectionOCGraetzPOD1_h_0.029_STAB_mu_1e5_alpha_0.01 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, yd = 0 in tutto il resto del dominio), mu = 1e5, alpha = 0.01, state stab delta=1.0
@@ -66,7 +66,7 @@ AdvectionOCGraetzPOD1_h_0.029_STAB_mu_1e5_alpha_0.01 = (yd = 1 nei due rettangol
 
 
 
-OC-GRAETZADVECTIONPOD2 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, tutto il resto del dominio libero) BC2 = 2.0 ON 1,5,6 
+OC-GRAETZADVECTIONPOD2 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, tutto il resto del dominio libero) BC2 = 0.0 ON 1,5,6 
 
 N = 9360 (dim FEM) h = 0.040 (max diam mesh)
 
@@ -87,7 +87,7 @@ AdvectionOCGraetzPOD2_h_0.040_STAB_mu_1e5_alpha_0.01 = (yd = 1 nei due rettangol
 N = 18798 (dim FEM) h = 0.029 (max diam mesh)
 
 file .py OC-GraetzAdvectionPOD2_h_0.029_mu_2e3_a_0.1   con questo mu inizia ad essere non stabile
-AdvectionOCGraetzPOD2_h_0.029_mu_2e3_alpha_0.1 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, tutto il resto del dominio libero), mu = 2e3, alpha = 0.1
+AdvectionOCGraetzPOD2_h_0.029_mu_2e3_alpha_0.1 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, tutto il resto del dominio libero), mu = 2e3, alpha = 0.1 mu_range=(1e3,1e6)
 
 file .py OC-GraetzAdvectionPOD2_h_0.029_mu_1e5_a_0.1
 AdvectionOCGraetzPOD2_h_0.029_mu_1e5_alpha_0.1 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, tutto il resto del dominio libero), mu = 1e5, alpha = 0.1

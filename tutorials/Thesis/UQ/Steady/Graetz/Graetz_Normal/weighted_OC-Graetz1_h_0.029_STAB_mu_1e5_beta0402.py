@@ -240,7 +240,7 @@ beta_b = [2 for _ in range(2)]
 # In[ ]:
 
 pod_galerkin_method = PODGalerkin(problem)
-pod_galerkin_method.set_Nmax(20)
+pod_galerkin_method.set_Nmax(20) #20
 
 #Offline Phase
 

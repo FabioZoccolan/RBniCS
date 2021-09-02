@@ -36,10 +36,10 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         self.vel = Expression("x[1] * (1 - x[1])", degree=1, domain=mesh)
         #self.lifting = Expression('((x[0] >= 1 && x[0] <= 2) && (x[1] == 1.0 || x[1]== 0.0) ) ? 1. : 0.', degree=1, domain=mesh)
         
-        #self.y_0 = Expression(("0."), degree=1, domain=mesh)
-        self.y_0 = Expression("1.0", degree=1, domain=mesh) #self.y_0 = Expression("1.0-1.0*(x[0]==0)-1.0*( x[0] <= 1)*(x[1]==0)-1.0*(x[0] <= 1)*( x[1]==1) ", degree=1, domain=mesh)
+        self.y_0 = Expression(("0."), degree=1, domain=mesh)
+        #self.y_0 = Expression("1.0", degree=1, domain=mesh) #self.y_0 = Expression("1.0-1.0*(x[0]==0)-1.0*( x[0] <= 1)*(x[1]==0)-1.0*(x[0] <= 1)*( x[1]==1) ", degree=1, domain=mesh)
         
-        self.bc1 = Constant(1.0)
+        #self.bc1 = ExpressionConstant(1.0)
         #self.bc2 = Constant(0.0)
         self.bc2 = Expression("0.0 + 1.0*(x[0] == 0.0)*(x[1] == 0.25)", degree=1, domain= mesh)
         #self.bc2 = Expression("0.0 + 1.0*(x[0] == 0.0)*(x[1] == 0.25)", element=block_V.ufl_element())
@@ -56,7 +56,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Return custom problem name
     def name(self):
-        return "Parabolic_OCSquarePOD1_h_0.025_STAB_mu_2e4_1.2_alpha_0.01_d_2.1"
+        return "Parabolic_OCSquarePOD4_h_0.025_STAB_mu_2e4_1.2_alpha_0.01_d_2.1"
 
 
     # Return theta multiplicative terms of the affine expansion of the problem.
@@ -304,7 +304,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             h0 = y_d * y_d * dx(3, domain=mesh) + y_d * y_d * dx(4, domain=mesh) 
             return (h0,)
         elif term == "dirichlet_bc_y":
-            bc0 = BlockDirichletBC([[[DirichletBC(self.V.sub(i), self.bc1, self.boundaries, 1),
+            bc0 = BlockDirichletBC([[[DirichletBC(self.V.sub(i), cos(i), self.boundaries, 1),
                                       DirichletBC(self.V.sub(i), self.bc2, self.boundaries, 2)] for i in range(0, Nt)], None, None])
             return (bc0,)
         elif term == "dirichlet_bc_p":
@@ -384,8 +384,8 @@ elliptic_optimal_control.set_mu_range(mu_range)
 offline_mu = (2e4, 1.2)
 elliptic_optimal_control.init()
 elliptic_optimal_control.set_mu(offline_mu)
-elliptic_optimal_control.solve() 
-elliptic_optimal_control.export_solution(filename="FEM_Par_OCSquare1_h_0.025_STAB_mu_2e4_1.2_alpha_0.01_d_2.1")
+elliptic_optimal_control.solve()
+elliptic_optimal_control.export_solution(filename="FEM_Par_OCSquare4_h_0.025_STAB_mu_2e4_1.2_alpha_0.01_d_2.1")
 
 
 # ### 4.4. Prepare reduction with a reduced basis method
@@ -407,7 +407,7 @@ pod_galerkin_method.set_Nmax(3)
 
 lifting_mu = (2e4, 1.2)
 elliptic_optimal_control.set_mu(lifting_mu)
-pod_galerkin_method.initialize_training_set(5) #100
+pod_galerkin_method.initialize_training_set(5)
 reduced_elliptic_optimal_control = pod_galerkin_method.offline()
 
 
@@ -418,9 +418,9 @@ reduced_elliptic_optimal_control = pod_galerkin_method.offline()
 
 online_mu = (2e4, 1.2)
 reduced_elliptic_optimal_control.set_mu(online_mu)
-reduced_solution = reduced_elliptic_optimal_control.solve() #put the number of basis the I wanted (3)
+reduced_solution = reduced_elliptic_optimal_control.solve()
 print("Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
-reduced_elliptic_optimal_control.export_solution(filename="online_solution_Par_OCSquare1_STAB_h_0.025_mu_2e4_1.2_alpha_0.01_d_2.1")
+reduced_elliptic_optimal_control.export_solution(filename="online_solution_Par_OCSquare4_STAB_h_0.025_mu_2e4_1.2_alpha_0.01_d_2.1")
 
 # In[ ]:
 

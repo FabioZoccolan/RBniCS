@@ -3,10 +3,8 @@ from rbnics import *
 from problems import *
 from reduction_methods import *
 
-"""### 3. Affine Decomposition
+###  Setting Problem: mu = 1e5 alpha=0.1 STAB delta=1
 
-For this problem the affine decomposition is straightforward.
-"""
 @OnlineStabilization()
 class EllipticOptimalControl(EllipticOptimalControlProblem):
 
@@ -220,11 +218,11 @@ print("Dim: ", V.dim() )
 """### 4.3. Allocate an object of the EllipticOptimalControl class"""
 
 problem = EllipticOptimalControl(V, subdomains=subdomains, boundaries=boundaries)
-mu_range = [(0.01, 1e6), (0.5, 4.0)]
+mu_range = [(1e4, 1e6)]
 problem.set_mu_range(mu_range)
 
 
-offline_mu = (1e5, 1.2)
+offline_mu = (1e5,)
 problem.init()
 problem.set_mu(offline_mu)
 problem.solve()
@@ -243,7 +241,7 @@ pod_galerkin_method.set_Nmax(20)
 # In[ ]:
 
 
-lifting_mu = (1e5, 1.2)
+lifting_mu = (1e5,)
 problem.set_mu(lifting_mu)
 pod_galerkin_method.initialize_training_set(100)
 reduced_elliptic_optimal_control = pod_galerkin_method.offline()
@@ -253,7 +251,7 @@ reduced_elliptic_optimal_control = pod_galerkin_method.offline()
 # In[ ]:
 
 
-online_mu = (1e5, 1.2)
+online_mu = (1e5,)
 reduced_elliptic_optimal_control.set_mu(online_mu)
 reduced_solution = reduced_elliptic_optimal_control.solve()
 print("Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())

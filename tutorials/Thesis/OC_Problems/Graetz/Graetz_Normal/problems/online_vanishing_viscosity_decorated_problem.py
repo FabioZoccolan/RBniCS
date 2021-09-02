@@ -16,10 +16,10 @@ def OnlineVanishingViscosityDecoratedProblem(viscosity, N_threshold_min, N_thres
         N_threshold_min=N_threshold_min,
         N_threshold_max=N_threshold_max
     )
-    def OnlineVanishingViscosityDecoratedProblem_Decorator(EllipticCoerciveProblem_DerivedClass):
+    def OnlineVanishingViscosityDecoratedProblem_Decorator(EllipticOptimalControlProblem_DerivedClass):
 
         @PreserveClassName
-        class OnlineVanishingViscosityDecoratedProblem_Class(EllipticCoerciveProblem_DerivedClass):
+        class OnlineVanishingViscosityDecoratedProblem_Class(EllipticOptimalControlProblem_DerivedClass):
 
             def __init__(self, V, **kwargs):
                 # Store input parameters from the decorator factory
@@ -35,7 +35,7 @@ def OnlineVanishingViscosityDecoratedProblem(viscosity, N_threshold_min, N_thres
                 # Flag to enable or disable stabilization
                 self.stabilized = True
                 # Call to parent
-                EllipticCoerciveProblem_DerivedClass.__init__(self, V, **kwargs)
+                EllipticOptimalControlProblem_DerivedClass.__init__(self, V, **kwargs)
 
         # return value (a class) for the decorator
         return OnlineVanishingViscosityDecoratedProblem_Class

@@ -15,13 +15,13 @@ from .online_rectification import OnlineRectification
 
 
 @ReducedProblemDecoratorFor(OnlineRectification)
-def OnlineRectificationDecoratedReducedProblem(EllipticCoerciveReducedProblem_DerivedClass):
+def OnlineRectificationDecoratedReducedProblem(EllipticOptimalControlProblem_DerivedClass): #EllipticCoerciveReducedProblem_DerivedClass):
 
     @PreserveClassName
-    class OnlineRectificationDecoratedReducedProblem_Class(EllipticCoerciveReducedProblem_DerivedClass):
+    class OnlineRectificationDecoratedReducedProblem_Class(EllipticOptimalControlProblem_DerivedClass): #EllipticCoerciveReducedProblem_DerivedClass):
         def __init__(self, truth_problem, **kwargs):
             # Call to parent
-            EllipticCoerciveReducedProblem_DerivedClass.__init__(self, truth_problem, **kwargs)
+            EllipticOptimalControlProblem_DerivedClass.__init__(self, truth_problem, **kwargs)
 
             # Copy of greedy snapshots
             self.snapshots_mu = GreedySelectedParametersList()
@@ -61,10 +61,10 @@ def OnlineRectificationDecoratedReducedProblem(EllipticCoerciveReducedProblem_De
                 self.assemble_operator("projection_truth_snapshots", "online")
                 self.assemble_operator("projection_reduced_snapshots", "online")
                 # Call Parent
-                EllipticCoerciveReducedProblem_DerivedClass._init_operators(self, current_stage)
+                EllipticOptimalControlProblem_DerivedClass._init_operators(self, current_stage)
             elif current_stage == "offline":
                 # Call Parent
-                EllipticCoerciveReducedProblem_DerivedClass._init_operators(self, current_stage)
+                EllipticOptimalControlProblem_DerivedClass._init_operators(self, current_stage)
             elif current_stage == "offline_rectification_postprocessing":
                 self.operator["projection_truth_snapshots"] = OnlineNonHierarchicalAffineExpansionStorage(1)
                 assert len(self.online_solve_kwargs_with_rectification) == len(
@@ -74,27 +74,27 @@ def OnlineRectificationDecoratedReducedProblem(EllipticCoerciveReducedProblem_De
                 # We do not call Parent method as there is no need to re-initialize offline operators
             else:
                 # Call Parent, which may eventually raise an error
-                EllipticCoerciveReducedProblem_DerivedClass._init_operators(self, current_stage)
+                EllipticOptimalControlProblem_DerivedClass._init_operators(self, current_stage)
 
         def _init_inner_products(self, current_stage="online"):
             if current_stage in ("online", "offline"):
                 # Call Parent
-                EllipticCoerciveReducedProblem_DerivedClass._init_inner_products(self, current_stage)
+                EllipticOptimalControlProblem_DerivedClass._init_inner_products(self, current_stage)
             elif current_stage == "offline_rectification_postprocessing":
                 pass  # We do not call Parent method as there is no need to re-initialize offline inner products
             else:
                 # Call Parent, which may eventually raise an error
-                EllipticCoerciveReducedProblem_DerivedClass._init_inner_products(self, current_stage)
+                EllipticOptimalControlProblem_DerivedClass._init_inner_products(self, current_stage)
 
         def _init_basis_functions(self, current_stage="online"):
             if current_stage in ("online", "offline"):
                 # Call Parent
-                EllipticCoerciveReducedProblem_DerivedClass._init_basis_functions(self, current_stage)
+                EllipticOptimalControlProblem_DerivedClass._init_basis_functions(self, current_stage)
             elif current_stage == "offline_rectification_postprocessing":
                 pass  # We do not call Parent method as there is no need to re-initialize offline basis functions
             else:
                 # Call Parent, which may eventually raise an error
-                EllipticCoerciveReducedProblem_DerivedClass._init_basis_functions(self, current_stage)
+                EllipticOptimalControlProblem_DerivedClass._init_basis_functions(self, current_stage)
 
         def _init_error_estimation_operators(self, current_stage="online"):
             if current_stage in ("online", "offline_rectification_postprocessing"):
@@ -102,10 +102,10 @@ def OnlineRectificationDecoratedReducedProblem(EllipticCoerciveReducedProblem_De
                 self._disable_error_estimation = True
             elif current_stage == "offline":
                 # Call Parent
-                EllipticCoerciveReducedProblem_DerivedClass._init_error_estimation_operators(self, current_stage)
+                EllipticOptimalControlProblem_DerivedClass._init_error_estimation_operators(self, current_stage)
             else:
                 # Call Parent, which may eventually raise an error
-                EllipticCoerciveReducedProblem_DerivedClass._init_error_estimation_operators(self, current_stage)
+                EllipticOptimalControlProblem_DerivedClass._init_error_estimation_operators(self, current_stage)
 
         def build_reduced_operators(self, current_stage="offline"):
             if current_stage == "offline_rectification_postprocessing":
@@ -119,7 +119,7 @@ def OnlineRectificationDecoratedReducedProblem(EllipticCoerciveReducedProblem_De
                 # We do not call Parent method as there is no need to re-compute offline operators
             else:
                 # Call Parent, which may eventually raise an error
-                EllipticCoerciveReducedProblem_DerivedClass.build_reduced_operators(self, current_stage)
+                EllipticOptimalControlProblem_DerivedClass.build_reduced_operators(self, current_stage)
 
         def assemble_operator(self, term, current_stage="online"):
             if term == "projection_truth_snapshots":
@@ -190,10 +190,10 @@ def OnlineRectificationDecoratedReducedProblem(EllipticCoerciveReducedProblem_De
                 else:
                     raise ValueError("Invalid stage in assemble_operator().")
             else:
-                return EllipticCoerciveReducedProblem_DerivedClass.assemble_operator(self, term, current_stage)
+                return EllipticOptimalControlProblem_DerivedClass.assemble_operator(self, term, current_stage)
 
         def _solve(self, N, **kwargs):
-            EllipticCoerciveReducedProblem_DerivedClass._solve(self, N, **kwargs)
+            EllipticOptimalControlProblem_DerivedClass._solve(self, N, **kwargs)
             if kwargs["online_rectification"]:
                 q = self.online_solve_kwargs_with_rectification.index(kwargs)
                 intermediate_solution = OnlineFunction(N)
@@ -209,7 +209,7 @@ def OnlineRectificationDecoratedReducedProblem(EllipticCoerciveReducedProblem_De
             if self._disable_error_estimation:
                 return NotImplemented
             else:
-                return EllipticCoerciveReducedProblem_DerivedClass.estimate_error(self)
+                return EllipticOptimalControlProblem_DerivedClass.estimate_error(self)
 
     # return value (a class) for the decorator
     return OnlineRectificationDecoratedReducedProblem_Class
