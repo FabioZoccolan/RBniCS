@@ -1,1 +1,0 @@
-(ComponentNameToBasisComponentIndexDict([('y', 0), ('u', 1), ('p', 2)]), ComponentNameToBasisComponentIndexDict([('y', 0), ('u', 1), ('p', 2)]))
