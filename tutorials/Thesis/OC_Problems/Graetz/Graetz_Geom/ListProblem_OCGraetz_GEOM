@@ -37,7 +37,7 @@ AdvectionOCGraetzPOD1_h_0.020_mu_1e4.8_3.3_alpha_0.01 = (yd = 1 nei due rettango
 
 
 
-OC-GRAETZADVECTIONPOD2 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, tutto il resto del dominio libero) BC2 = 2.0 ON 1,5,6 
+OC-GRAETZADVECTIONPOD2 = (yd = 1 nei due rettangolini sopra e sotto nella seconda parte del dominio, tutto il resto del dominio libero) BC2 = 0.0 ON 1,5,6 
 
 N = 13146 (dim FEM) h = 0.034 (max diam mesh)
 

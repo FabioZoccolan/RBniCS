@@ -142,11 +142,11 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             h0 = y_d * y_d * dx(3, domain=mesh) + y_d * y_d * dx(4, domain=mesh)  #RICONTROLLARE
             return (h0,)
         elif term == "dirichlet_bc_y":
-            bc0 = [DirichletBC(self.V.sub(0), Constant(2.0), self.boundaries, 1),
+            bc0 = [DirichletBC(self.V.sub(0), Constant(0.0), self.boundaries, 1),
                    DirichletBC(self.V.sub(0), Constant(1.0), self.boundaries, 2),
                    DirichletBC(self.V.sub(0), Constant(1.0), self.boundaries, 4),
-                   DirichletBC(self.V.sub(0), Constant(2.0), self.boundaries, 5),
-                   DirichletBC(self.V.sub(0), Constant(2.0), self.boundaries, 6)]
+                   DirichletBC(self.V.sub(0), Constant(0.0), self.boundaries, 5),
+                   DirichletBC(self.V.sub(0), Constant(0.0), self.boundaries, 6)]
             return (bc0,)
         elif term == "dirichlet_bc_p":
             bc0 = [DirichletBC(self.V.sub(2), Constant(0.0), self.boundaries, 1),
