@@ -83,5 +83,7 @@ file .py OC-SquareAdvectionPOD-3_h_0.025_STAB_a_0.1 : alpha = 0.1, state and adj
 
 file .py OC-SquareAdvectionPOD-3_h_0.025_a_0.01 : alpha = 0.01
 
+file .py OC-SquareAdvectionPOD-3_h_0.025_STAB_a_0.01 : alpha = 0.01, state and adjoint stab delta= 2.1
+
 
 file .py OC-SquareAdvectionPOD-3_h_0.025_STAB_a_0.01 : alpha = 0.01, state and adjoint stab delta= 2.1

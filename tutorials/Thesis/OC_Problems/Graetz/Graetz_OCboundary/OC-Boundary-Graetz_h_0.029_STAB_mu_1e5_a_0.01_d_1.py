@@ -306,12 +306,15 @@ reduced_elliptic_optimal_control = pod_galerkin_method.offline()
 
 online_mu = (1e5,)
 reduced_elliptic_optimal_control.set_mu(online_mu)
-reduced_solution = reduced_elliptic_optimal_control.solve()
-print("Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
-reduced_elliptic_optimal_control.export_solution(filename="Boundary_online_solution_OCGraetz_h_0.029_mu_1e5_alpha_0.01")
+reduced_solution = reduced_elliptic_optimal_control.solve(online_stabilization=False) 
+print("NOT ONLINE STAB: Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
+reduced_elliptic_optimal_control.export_solution(filename="online_solution_Boundary_OCGraetz2_h_0.029_OffSTAB_mu_1e5_alpha_0.1")
+reduced_elliptic_optimal_control.export_error(filename="online_error_Boundary_OCGraetz2_h_0.029_OffSTAB_mu_1e5_alpha_0.1")
 
-# In[ ]:
-
+reduced_solution = reduced_elliptic_optimal_control.solve(online_stabilization=True) 
+print("ONLINE STAB: Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
+reduced_elliptic_optimal_control.export_solution(filename="online_solution_Boundary_OCGraetz2_h_0.029_OffONSTAB_mu_1e5_alpha_0.1")
+reduced_elliptic_optimal_control.export_error(filename="online_error_Boundary_OCGraetz2_h_0.029_OffONSTAB_mu_1e5_alpha_0.1")
 
 
 
@@ -319,9 +322,29 @@ reduced_elliptic_optimal_control.export_solution(filename="Boundary_online_solut
 
 # In[ ]:
 
-pod_galerkin_method.initialize_testing_set(100)
-pod_galerkin_method.error_analysis()
 
-# 8. Perform a speedup analysis
-pod_galerkin_method.speedup_analysis()
+pod_galerkin_method.initialize_testing_set(100)
+
+print("\n----------------------------------------OFFLINE STABILIZATION ERROR ANALYSIS BEGINS-------------------------------------------------\n")
+
+pod_galerkin_method.error_analysis(online_stabilization=False, filename="error_analysis_Boundary_OCGraetz2_h_0.029_OffSTAB_mu_1e5_alpha_0.1")
+
+print("\n--------------------------------------ONLINE-OFFLINE STABILIZATION ERROR ANALYSIS BEGINS--------------------------------------------\n")
+
+pod_galerkin_method.error_analysis(online_stabilization=True, filename="error_analysis_Boundary_OCGraetz2_h_0.029_OffONSTAB_mu_1e5_alpha_0.1")
+
+
+
+# ### 4.8. Perform a speedup analysis
+
+# In[ ]:
+
+print("\n-----------------------------------------OFFLINE STABILIZATION SPEED-UP ANALYSIS BEGINS----------------------------------------------\n")
+print("")
+pod_galerkin_method.speedup_analysis(online_stabilization=False, filename="speedup_analysis_Boundary_OCGraetz2_h_0.029_OffSTAB_mu_1e5_alpha_0.1")
+print("\n---------------------------------------ONLINE-OFFLINE STABILIZATION SPEED-UP ANALYSIS BEGINS------------------------------------------\n")
+pod_galerkin_method.speedup_analysis(online_stabilization=True, filename="speedup_analysis_Boundary_OCGraetz2_h_0.029_OffONSTAB_mu_1e5_alpha_0.1")
+
+
+
 

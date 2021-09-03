@@ -186,7 +186,7 @@ print("Dim: ", V.dim() )
 
 
 problem = EllipticOptimalControl(V, subdomains=subdomains, boundaries=boundaries)
-mu_range = [(1e4,5e5), (0.0, 6.3)]
+mu_range = [(1e4,1e5), (0.0, 6.3)]
 problem.set_mu_range(mu_range)
 
 offline_mu = (2e4, 1.2)
