@@ -60,7 +60,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Return custom problem name
     def name(self):
-        return "UQ_Parabolic_OCGraetzPOD3_GEOM_h_0.020_STAB_mu_1e4.8_3.3_alpha_0.01_d_1"
+        return "UQ_Parabolic_OCGraetzPOD2_GEOM_h_0.020_STAB_mu_1e4.8_3.3_alpha_0.01_d_1"
 
 
     # Return theta multiplicative terms of the affine expansion of the problem.
@@ -411,15 +411,15 @@ print("Dim: ", block_V.dim() )
 elliptic_optimal_control = EllipticOptimalControl(block_V, subdomains=subdomains, boundaries=boundaries, T=T, dt=dt, Nt=Nt)
 mu_range =  [(0.01, 1e6), (0.5, 4.0)]
 elliptic_optimal_control.set_mu_range(mu_range)
-beta_a = [75 for _ in range(2)]
-beta_b = [75 for _ in range(2)]
+beta_a = [4 for _ in range(2)]
+beta_b = [2 for _ in range(2)]
 
 pod_galerkin_method = PODGalerkin(elliptic_optimal_control)
-pod_galerkin_method.set_Nmax(3)
+pod_galerkin_method.set_Nmax(20)
 
 #Offline Phase
 
-pod_galerkin_method.initialize_training_set(5, sampling=BetaDistribution(beta_a, beta_b),typeGrid=2) 
+pod_galerkin_method.initialize_training_set(100, sampling=BetaDistribution(beta_a, beta_b),typeGrid=2) 
 reduced_elliptic_optimal_control = pod_galerkin_method.offline()
 
 
@@ -427,7 +427,7 @@ offline_mu =  (10**4.8, 3.3)
 elliptic_optimal_control.init()
 elliptic_optimal_control.set_mu(offline_mu)
 elliptic_optimal_control.solve()
-elliptic_optimal_control.export_solution(filename="FEM_Par_UQ_OCGraetz3_GEOM_h_0.020_STAB_mu_1e5_alpha_0.01")
+elliptic_optimal_control.export_solution(filename="FEM_Par_UQ_OCGraetz2_GEOM_h_0.020_STAB_mu_1e5_alpha_0.01_beta0402")
 
 print("Full order output for mu =", offline_mu, "is", elliptic_optimal_control.compute_output())
 
@@ -439,23 +439,52 @@ print("Full order output for mu =", offline_mu, "is", elliptic_optimal_control.c
 
 
 online_mu =  (10**4.8, 3.3)
+
 reduced_elliptic_optimal_control.set_mu(online_mu)
-reduced_solution = reduced_elliptic_optimal_control.solve(online_stabilization=True)
-print("Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
-reduced_elliptic_optimal_control.export_solution(filename="online_solution_Par_UQ_OCGraetz3_GEOM_STAB_h_0.020_mu_1e5_alpha_0.01")
+reduced_solution = reduced_elliptic_optimal_control.solve(online_stabilization=False) 
+print("NOT ONLINE STAB: Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
+reduced_elliptic_optimal_control.export_solution(filename="online_solution_UQ_Par_OCGraetz2_GEOM_h_0.020_OffSTAB_mu_1e4.8_3.3_alpha_0.01_beta0402")
+reduced_elliptic_optimal_control.export_error(filename="online_error_UQ_Par_OCGraetz2_GEOM_h_0.020_OffSTAB_mu_1e4.8_3.3_alpha_0.01_beta0402")
+
+reduced_solution = reduced_elliptic_optimal_control.solve(online_stabilization=True) 
+print("ONLINE STAB: Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
+reduced_elliptic_optimal_control.export_solution(filename="online_solution_UQ_Par_OCGraetz2_GEOM_h_0.020_OffONSTAB_mu_1e4.8_3.3_alpha_0.01_beta0402")
+reduced_elliptic_optimal_control.export_error(filename="online_error_UQ_Par_OCGraetz2_GEOM_h_0.020_OffONSTAB_mu_1e4.8_3.3_alpha_0.01_beta0402")
+
+
+
+# ### Perform an error analysis
 
 # In[ ]:
 
 
+pod_galerkin_method.initialize_testing_set(100, sampling=BetaDistribution(beta_a, beta_b))
+
+print("\n----------------------------------------OFFLINE STABILIZATION ERROR ANALYSIS BEGINS-------------------------------------------------\n")
+
+pod_galerkin_method.error_analysis(online_stabilization=False, filename="error_analysis_UQ_Par_OCGraetz2_GEOM_h_0.020_OffSTAB_mu_1e4.8_3.3_alpha_0.01_beta0402")
+
+print("\n--------------------------------------ONLINE-OFFLINE STABILIZATION ERROR ANALYSIS BEGINS--------------------------------------------\n")
+
+pod_galerkin_method.error_analysis(online_stabilization=True, filename="error_analysis_UQ_Par_OCGraetz2_GEOM_h_0.020_OffONSTAB_mu_1e4.8_3.3_alpha_0.01_beta0402")
 
 
-# ### 4.7. Perform an error analysis
+
+# ### Perform a speedup analysis
 
 # In[ ]:
 
-pod_galerkin_method.initialize_testing_set(20, sampling=BetaDistribution(beta_a, beta_b)) #100
-pod_galerkin_method.error_analysis()
+print("\n-----------------------------------------OFFLINE STABILIZATION SPEED-UP ANALYSIS BEGINS----------------------------------------------\n")
+print("")
+pod_galerkin_method.speedup_analysis(online_stabilization=False, filename="speedup_analysis_Par_OCGraetz2_GEOM_h_0.020_OffSTAB_mu_1e4.8_3.3_alpha_0.01_beta0402")
+print("\n---------------------------------------ONLINE-OFFLINE STABILIZATION SPEED-UP ANALYSIS BEGINS------------------------------------------\n")
+pod_galerkin_method.speedup_analysis(online_stabilization=True, filename="speedup_analysis_Par_OCGraetz2_GEOM_h_0.020_OffONSTAB_mu_1e4.8_3.3_alpha_0.01_beta0402")
 
-# 8. Perform a speedup analysis
-pod_galerkin_method.speedup_analysis()
+
+
+
+
+
+
+
 

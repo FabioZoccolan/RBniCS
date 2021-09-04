@@ -376,7 +376,7 @@ boundaries = MeshFunction("size_t", mesh, "data/graetzOC_h_0.020_facet_region.xm
 print("hMax: ", mesh.hmax() )
 
 # Create Finite Element space (Lagrange P1)
-T = 3.0
+T = 2.0
 dt = 0.5
 Nt = int(ceil(T/dt))
 
@@ -401,10 +401,10 @@ print("Dim: ", block_V.dim() )
 
 # Allocate an object of the EllipticOptimalControl class
 elliptic_optimal_control = EllipticOptimalControl(block_V, subdomains=subdomains, boundaries=boundaries, T=T, dt=dt, Nt=Nt)
-mu_range =  [(1e4, 1e6)]
+mu_range =  [(1e4, 1e6), (0.5, 4.0)]
 elliptic_optimal_control.set_mu_range(mu_range)
 
-offline_mu =  (10**4.8,)
+offline_mu =  (10**4.8,3.3)
 elliptic_optimal_control.init()
 elliptic_optimal_control.set_mu(offline_mu)
 elliptic_optimal_control.solve()
@@ -439,14 +439,18 @@ reduced_elliptic_optimal_control = pod_galerkin_method.offline()
 # In[ ]:
 
 
-online_mu =  (10**4.8,)
+online_mu = (10**4.8, 3.3)
+
 reduced_elliptic_optimal_control.set_mu(online_mu)
-reduced_solution = reduced_elliptic_optimal_control.solve()
-print("Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
-reduced_elliptic_optimal_control.export_solution(filename="online_solution_Par_OCGraetz2_GEOM_STAB_h_0.020_mu_1e5_alpha_0.01")
+reduced_solution = reduced_elliptic_optimal_control.solve(online_stabilization=False) 
+print("NOT ONLINE STAB: Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
+reduced_elliptic_optimal_control.export_solution(filename="online_solution_Par_OCGraetz2_GEOM_h_0.020_OffSTAB_mu_1e4.8_3.3_alpha_0.01")
+reduced_elliptic_optimal_control.export_error(filename="online_error_Par_OCGraetz2_GEOM_h_0.020_OffSTAB_mu_1e4.8_3.3_alpha_0.01")
 
-# In[ ]:
-
+reduced_solution = reduced_elliptic_optimal_control.solve(online_stabilization=True) 
+print("ONLINE STAB: Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
+reduced_elliptic_optimal_control.export_solution(filename="online_solution_Par_OCGraetz2_GEOM_h_0.020_OffONSTAB_mu_1e4.8_3.3_alpha_0.01")
+reduced_elliptic_optimal_control.export_error(filename="online_error_Par_OCGraetz2_GEOM_h_0.020_OffONSTAB_mu_1e4.8_3.3_alpha_0.01")
 
 
 
@@ -454,9 +458,34 @@ reduced_elliptic_optimal_control.export_solution(filename="online_solution_Par_O
 
 # In[ ]:
 
-pod_galerkin_method.initialize_testing_set(100)
-pod_galerkin_method.error_analysis()
 
-# Perform a speedup analysis
-pod_galerkin_method.speedup_analysis()
+pod_galerkin_method.initialize_testing_set(100)
+
+print("\n----------------------------------------OFFLINE STABILIZATION ERROR ANALYSIS BEGINS-------------------------------------------------\n")
+
+pod_galerkin_method.error_analysis(online_stabilization=False, filename="error_analysis_Par_OCGraetz2_GEOM_h_0.020_OffSTAB_mu_1e4.8_3.3_alpha_0.01")
+
+print("\n--------------------------------------ONLINE-OFFLINE STABILIZATION ERROR ANALYSIS BEGINS--------------------------------------------\n")
+
+pod_galerkin_method.error_analysis(online_stabilization=True, filename="error_analysis_Par_OCGraetz2_GEOM_h_0.020_OffONSTAB_mu_1e4.8_3.3_alpha_0.01")
+
+
+
+# ### Perform a speedup analysis
+
+# In[ ]:
+
+print("\n-----------------------------------------OFFLINE STABILIZATION SPEED-UP ANALYSIS BEGINS----------------------------------------------\n")
+print("")
+pod_galerkin_method.speedup_analysis(online_stabilization=False, filename="speedup_analysis_Par_OCGraetz2_GEOM_h_0.020_OffSTAB_mu_1e4.8_3.3_alpha_0.01")
+print("\n---------------------------------------ONLINE-OFFLINE STABILIZATION SPEED-UP ANALYSIS BEGINS------------------------------------------\n")
+pod_galerkin_method.speedup_analysis(online_stabilization=True, filename="speedup_analysis_Par_OCGraetz2_GEOM_h_0.020_OffONSTAB_mu_1e4.8_3.3_alpha_0.01")
+
+
+
+
+
+
+
+
 

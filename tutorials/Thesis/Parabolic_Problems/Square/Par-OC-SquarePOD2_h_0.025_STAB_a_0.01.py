@@ -31,7 +31,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         self.ds = Measure("ds")(subdomain_data=self.boundaries)
         # Regularization coefficient
         self.alpha = 0.01
-        self.y_d = Constant(1.0)
+        self.y_d = Constant(0.5)
         # Store the velocity expression
         self.vel = Expression("x[1] * (1 - x[1])", degree=1, domain=mesh)
         #self.lifting = Expression('((x[0] >= 1 && x[0] <= 2) && (x[1] == 1.0 || x[1]== 0.0) ) ? 1. : 0.', degree=1, domain=mesh)
@@ -56,7 +56,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Return custom problem name
     def name(self):
-        return "Parabolic_OCSquarePOD2_h_0.025_STAB_mu_2e4_1.2_alpha_0.01_d_2.1"
+        return "Parabolic_OCSquarePOD3_h_0.025_STAB_mu_2e4_1.2_alpha_0.01_d_2.1"
 
 
     # Return theta multiplicative terms of the affine expansion of the problem.
@@ -385,7 +385,7 @@ offline_mu = (2e4, 1.2)
 elliptic_optimal_control.init()
 elliptic_optimal_control.set_mu(offline_mu)
 elliptic_optimal_control.solve()
-elliptic_optimal_control.export_solution(filename="FEM_Par_OCSquare2_h_0.025_STAB_mu_2e4_1.2_alpha_0.01_d_2.1")
+elliptic_optimal_control.export_solution(filename="FEM_Par_OCSquare3_h_0.025_STAB_mu_2e4_1.2_alpha_0.01_d_2.1")
 
 
 # ### 4.4. Prepare reduction with a reduced basis method
@@ -395,7 +395,7 @@ elliptic_optimal_control.export_solution(filename="FEM_Par_OCSquare2_h_0.025_STA
 
 
 pod_galerkin_method = PODGalerkin(elliptic_optimal_control)
-pod_galerkin_method.set_Nmax(3)
+pod_galerkin_method.set_Nmax(20)
 
 
 
@@ -405,9 +405,9 @@ pod_galerkin_method.set_Nmax(3)
 # In[ ]:
 
 
-lifting_mu = (2e4, 1.2)
-elliptic_optimal_control.set_mu(lifting_mu)
-pod_galerkin_method.initialize_training_set(5)
+#lifting_mu = (2e4, 1.2)
+#elliptic_optimal_control.set_mu(lifting_mu)
+pod_galerkin_method.initialize_training_set(100)
 reduced_elliptic_optimal_control = pod_galerkin_method.offline()
 
 
@@ -415,25 +415,46 @@ reduced_elliptic_optimal_control = pod_galerkin_method.offline()
 
 # In[ ]:
 
-
 online_mu = (2e4, 1.2)
+
 reduced_elliptic_optimal_control.set_mu(online_mu)
-reduced_solution = reduced_elliptic_optimal_control.solve()
-print("Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
-reduced_elliptic_optimal_control.export_solution(filename="online_solution_Par_OCSquare2_STAB_h_0.025_mu_2e4_1.2_alpha_0.01_d_2.1")
+reduced_solution = reduced_elliptic_optimal_control.solve(online_stabilization=False) 
+print("NOT ONLINE STAB: Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
+reduced_elliptic_optimal_control.export_solution(filename="online_solution_Par_OCSquare3_h_0.025_OffSTAB_mu_2e4_1.2_alpha_0.01_d_2.1")
+reduced_elliptic_optimal_control.export_error(filename="online_error_Par_OCSquare3_h_0.025_OffSTAB_mu_2e4_1.2_alpha_0.01_d_2.1")
+
+reduced_solution = reduced_elliptic_optimal_control.solve(online_stabilization=True) 
+print("ONLINE STAB: Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
+reduced_elliptic_optimal_control.export_solution(filename="online_solution_Par_OCSquare3_h_0.025_OffONSTAB_mu_2e4_1.2_alpha_0.01_d_2.1")
+reduced_elliptic_optimal_control.export_error(filename="online_error_Par_OCSquare3_h_0.025_OffONSTAB_mu_2e4_1.2_alpha_0.01_d_2.1")
+
+
+
+# ### Perform an error analysis
 
 # In[ ]:
 
-
-
-
-# ### 4.7. Perform an error analysis
-
-# In[ ]:
 
 pod_galerkin_method.initialize_testing_set(100)
-pod_galerkin_method.error_analysis()
 
-# 8. Perform a speedup analysis
-pod_galerkin_method.speedup_analysis()
+print("\n----------------------------------------OFFLINE STABILIZATION ERROR ANALYSIS BEGINS-------------------------------------------------\n")
+
+pod_galerkin_method.error_analysis(online_stabilization=False, filename="error_analysis_Par_OCSquare3_h_0.025_OffSTAB_mu_2e4_1.2_alpha_0.01_d_2.1")
+
+print("\n--------------------------------------ONLINE-OFFLINE STABILIZATION ERROR ANALYSIS BEGINS--------------------------------------------\n")
+
+pod_galerkin_method.error_analysis(online_stabilization=True, filename="error_analysis_Par_OCSquare3_h_0.025_OffONSTAB_mu_2e4_1.2_alpha_0.01_d_2.1")
+
+
+
+# ### Perform a speedup analysis
+
+# In[ ]:
+
+print("\n-----------------------------------------OFFLINE STABILIZATION SPEED-UP ANALYSIS BEGINS----------------------------------------------\n")
+print("")
+pod_galerkin_method.speedup_analysis(online_stabilization=False, filename="speedup_analysis_Par_OCSquare3_h_0.025_OffSTAB_mu_2e4_1.2_alpha_0.01_d_2.1")
+print("\n---------------------------------------ONLINE-OFFLINE STABILIZATION SPEED-UP ANALYSIS BEGINS------------------------------------------\n")
+pod_galerkin_method.speedup_analysis(online_stabilization=True, filename="speedup_analysis_Par_OCSquare3_h_0.025_OffONSTAB_mu_2e4_1.2_alpha_0.01_d_2.1")
+
 
