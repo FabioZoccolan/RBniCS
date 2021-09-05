@@ -11,10 +11,10 @@ from problems import OnlineRectification
 
 
 @ReductionMethodDecoratorFor(OnlineRectification)
-def OnlineRectificationDecoratedReductionMethod(EllipticCoerciveReductionMethod_DerivedClass):
+def OnlineRectificationDecoratedReductionMethod(EllipticOptimalControlReductionMethod_DerivedClass):
 
     @PreserveClassName
-    class OnlineRectificationDecoratedReductionMethod_Class(EllipticCoerciveReductionMethod_DerivedClass):
+    class OnlineRectificationDecoratedReductionMethod_Class(EllipticOptimalControlReductionMethod_DerivedClass):
         def _offline(self):
             # Change default online solve arguments during offline stage to not use rectification
             # (which will be prepared in a postprocessing stage)
@@ -23,7 +23,7 @@ def OnlineRectificationDecoratedReductionMethod(EllipticCoerciveReductionMethod_
                 **self.reduced_problem._online_solve_default_kwargs)
 
             # Call standard offline phase
-            EllipticCoerciveReductionMethod_DerivedClass._offline(self)
+            EllipticOptimalControlReductionMethod_DerivedClass._offline(self)
 
             # Start rectification postprocessing
             print(TextBox(self.truth_problem.name() + " " + self.label
@@ -59,7 +59,7 @@ def OnlineRectificationDecoratedReductionMethod(EllipticCoerciveReductionMethod_
             self.reduced_problem.snapshots_mu.append(self.truth_problem.mu)
             self.reduced_problem.snapshots.enrich(snapshot)
             # Call Parent
-            EllipticCoerciveReductionMethod_DerivedClass.update_basis_matrix(self, snapshot)
+            EllipticOptimalControlReductionMethod_DerivedClass.update_basis_matrix(self, snapshot)
 
     # return value (a class) for the decorator
     return OnlineRectificationDecoratedReductionMethod_Class

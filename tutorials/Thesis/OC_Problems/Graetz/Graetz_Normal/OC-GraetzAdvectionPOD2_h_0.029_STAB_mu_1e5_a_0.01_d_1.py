@@ -261,16 +261,24 @@ reduced_elliptic_optimal_control = pod_galerkin_method.offline()
 online_mu = (1e5,)
 reduced_elliptic_optimal_control.set_mu(online_mu)
 reduced_solution = reduced_elliptic_optimal_control.solve(online_stabilization=False) 
+
 print("NOT ONLINE STAB: Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
 reduced_elliptic_optimal_control.export_solution(filename="online_solution_OCGraetz2_h_0.029_OffSTAB_mu_1e5_alpha_0.01")
 reduced_elliptic_optimal_control.export_error(filename="online_error_OCGraetz2_h_0.029_OffSTAB_mu_1e5_alpha_0.01")
 
+reduced_solution_N_3 = reduced_elliptic_optimal_control.solve(online_stabilization=False, N = 3) 
+reduced_elliptic_optimal_control.export_solution(filename="online_solution_OCGraetz2_h_0.029_OffSTAB_mu_1e5_alpha_0.01_N_3")
+reduced_elliptic_optimal_control.export_error(filename="online_error_OCGraetz2_h_0.029_OffSTAB_mu_1e5_alpha_0.01_N_3")
+
 reduced_solution = reduced_elliptic_optimal_control.solve(online_stabilization=True) 
+
 print("ONLINE STAB: Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
 reduced_elliptic_optimal_control.export_solution(filename="online_solution_OCGraetz2_h_0.029_OffONSTAB_mu_1e5_alpha_0.01")
 reduced_elliptic_optimal_control.export_error(filename="online_error_OCGraetz2_h_0.029_OffONSTAB_mu_1e5_alpha_0.01")
 
-
+reduced_solution_N_3 = reduced_elliptic_optimal_control.solve(online_stabilization=True, N = 3) 
+reduced_elliptic_optimal_control.export_solution(filename="online_solution_OCGraetz2_h_0.029_OffONSTAB_mu_1e5_alpha_0.01_N_3")
+reduced_elliptic_optimal_control.export_error(filename="online_error_OCGraetz2_h_0.029_OffONSTAB_mu_1e5_alpha_0.01_N_3")
 
 # ### 4.7. Perform an error analysis
 

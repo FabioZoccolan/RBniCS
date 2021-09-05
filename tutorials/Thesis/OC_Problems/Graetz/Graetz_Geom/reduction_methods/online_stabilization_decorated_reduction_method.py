@@ -9,10 +9,10 @@ from problems import OnlineStabilization
 
 
 @ReductionMethodDecoratorFor(OnlineStabilization)
-def OnlineStabilizationDecoratedReductionMethod(EllipticCoerciveReductionMethod_DerivedClass):
+def OnlineStabilizationDecoratedReductionMethod(EllipticOptimalControlReductionMethod_DerivedClass):
 
     @PreserveClassName
-    class OnlineStabilizationDecoratedReductionMethod_Class(EllipticCoerciveReductionMethod_DerivedClass):
+    class OnlineStabilizationDecoratedReductionMethod_Class(EllipticOptimalControlReductionMethod_DerivedClass):
         pass
 
     # return value (a class) for the decorator

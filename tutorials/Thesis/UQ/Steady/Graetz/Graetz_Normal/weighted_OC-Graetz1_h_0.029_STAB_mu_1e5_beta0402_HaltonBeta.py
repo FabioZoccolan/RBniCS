@@ -2,7 +2,7 @@ from dolfin import *
 from rbnics import *
 from problems import *
 from reduction_methods import *
-from rbnics.sampling.distributions import *
+#from rbnics.sampling.distributions import *
 from reduction_methods import *
 from sampling.distributions import *
 from sampling.weights import *
@@ -44,7 +44,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Return custom problem name
     def name(self):
-        return "UQ_OCGraetzPOD1_h_0.029_STAB_mu_1e5_alpha_0.01_beta0402"
+        return "UQ_OCGraetzPOD1_h_0.029_STAB_mu_1e5_alpha_0.01_beta0402_haltonbeta"
 
     # Return theta multiplicative terms of the affine expansion of the problem.
     
@@ -230,7 +230,7 @@ print("Dim: ", V.dim() )
 """### 4.3. Allocate an object of the EllipticOptimalControl class"""
 
 problem = EllipticOptimalControl(V, subdomains=subdomains, boundaries=boundaries)
-mu_range = [(0.01, 1e6)]
+mu_range = [(1, 1e6)]
 problem.set_mu_range(mu_range)
 beta_a = [4 for _ in range(1)]
 beta_b = [2 for _ in range(1)]
@@ -244,7 +244,7 @@ pod_galerkin_method.set_Nmax(20) #20
 
 #Offline Phase
 
-pod_galerkin_method.initialize_training_set(100, sampling=BetaDistribution(beta_a, beta_b),  weight=BetaWeight(beta_a, beta_b), typegrid=2)
+pod_galerkin_method.initialize_training_set(100, sampling=BetaDistribution(beta_a, beta_b), typegrid = 3)
 reduced_elliptic_optimal_control = pod_galerkin_method.offline()
 
 
@@ -252,7 +252,7 @@ offline_mu = (1e5, )
 #problem.init()
 problem.set_mu(offline_mu)
 problem.solve()
-problem.export_solution(filename="FEM_UQ_OCGraetz1_h_0.029_STAB_mu_1e5_alpha_0.01_beta0402")
+problem.export_solution(filename="FEM_UQ_OCGraetz1_h_0.029_STAB_mu_1e5_alpha_0.01_beta0402_haltonbeta")
 
 print("Full order output for mu =", offline_mu, "is", problem.compute_output())
 
@@ -275,13 +275,13 @@ online_mu = (1e5,)
 reduced_elliptic_optimal_control.set_mu(online_mu)
 reduced_solution = reduced_elliptic_optimal_control.solve(online_stabilization=False) 
 print("NOT ONLINE STAB: Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
-reduced_elliptic_optimal_control.export_solution(filename="online_solution_UQ_OCGraetz2_h_0.029_OffSTAB_mu_1e5_alpha_0.01_beta0402")
-reduced_elliptic_optimal_control.export_error(filename="online_error_UQ_OCGraetz2_h_0.029_OffSTAB_mu_1e5_alpha_0.01_beta0402")
+reduced_elliptic_optimal_control.export_solution(filename="online_solution_UQ_OCGraetz2_h_0.029_OffSTAB_mu_1e5_alpha_0.01_beta0402_haltonbeta")
+reduced_elliptic_optimal_control.export_error(filename="online_error_UQ_OCGraetz2_h_0.029_OffSTAB_mu_1e5_alpha_0.01_beta0402_haltonbeta")
 
 reduced_solution = reduced_elliptic_optimal_control.solve(online_stabilization=True) 
 print("ONLINE STAB: Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
-reduced_elliptic_optimal_control.export_solution(filename="online_solution_UQ_OCGraetz2_h_0.029_OffONSTAB_mu_1e5_alpha_0.01_beta0402")
-reduced_elliptic_optimal_control.export_error(filename="online_error_UQ_OCGraetz2_h_0.029_OffONSTAB_mu_1e5_alpha_0.01_beta0402")
+reduced_elliptic_optimal_control.export_solution(filename="online_solution_UQ_OCGraetz2_h_0.029_OffONSTAB_mu_1e5_alpha_0.01_beta0402_haltonbeta")
+reduced_elliptic_optimal_control.export_error(filename="online_error_UQ_OCGraetz2_h_0.029_OffONSTAB_mu_1e5_alpha_0.01_beta0402_haltonbeta")
 
 
 
@@ -294,11 +294,11 @@ pod_galerkin_method.initialize_testing_set(100, sampling=BetaDistribution(beta_a
 
 print("\n----------------------------------------OFFLINE STABILIZATION ERROR ANALYSIS BEGINS-------------------------------------------------\n")
 
-pod_galerkin_method.error_analysis(online_stabilization=False, filename="error_analysis_UQ_OCGraetz2_h_0.029_OffSTAB_mu_1e5_alpha_0.01_beta0402")
+pod_galerkin_method.error_analysis(online_stabilization=False, filename="error_analysis_UQ_OCGraetz2_h_0.029_OffSTAB_mu_1e5_alpha_0.01_beta0402_haltonbeta")
 
 print("\n--------------------------------------ONLINE-OFFLINE STABILIZATION ERROR ANALYSIS BEGINS--------------------------------------------\n")
 
-pod_galerkin_method.error_analysis(online_stabilization=True, filename="error_analysis_UQ_OCGraetz2_h_0.029_OffONSTAB_mu_1e5_alpha_0.01_beta0402")
+pod_galerkin_method.error_analysis(online_stabilization=True, filename="error_analysis_UQ_OCGraetz2_h_0.029_OffONSTAB_mu_1e5_alpha_0.01_beta0402_haltonbeta")
 
 
 
@@ -308,9 +308,9 @@ pod_galerkin_method.error_analysis(online_stabilization=True, filename="error_an
 
 print("\n-----------------------------------------OFFLINE STABILIZATION SPEED-UP ANALYSIS BEGINS----------------------------------------------\n")
 print("")
-pod_galerkin_method.speedup_analysis(online_stabilization=False, filename="speedup_analysis_UQ_OCGraetz2_h_0.029_OffSTAB_mu_1e5_alpha_0.01_beta0402")
+pod_galerkin_method.speedup_analysis(online_stabilization=False, filename="speedup_analysis_UQ_OCGraetz2_h_0.029_OffSTAB_mu_1e5_alpha_0.01_beta0402_haltonbeta")
 print("\n---------------------------------------ONLINE-OFFLINE STABILIZATION SPEED-UP ANALYSIS BEGINS------------------------------------------\n")
-pod_galerkin_method.speedup_analysis(online_stabilization=True, filename="speedup_analysis_UQ_OCGraetz2_h_0.029_OffONSTAB_mu_1e5_alpha_0.01_beta0402")
+pod_galerkin_method.speedup_analysis(online_stabilization=True, filename="speedup_analysis_UQ_OCGraetz2_h_0.029_OffONSTAB_mu_1e5_alpha_0.01_beta0402_haltonbeta")
 
 
 

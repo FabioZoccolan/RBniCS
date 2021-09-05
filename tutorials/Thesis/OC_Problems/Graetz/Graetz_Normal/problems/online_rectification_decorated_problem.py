@@ -11,9 +11,9 @@ def OnlineRectificationDecoratedProblem(**decorator_kwargs):
     from .online_rectification import OnlineRectification
 
     @ProblemDecoratorFor(OnlineRectification)
-    def OnlineRectificationDecoratedProblem_Decorator(EllipticOptimalControlProblem_DerivedClass): #EllipticCoerciveProblem_DerivedClass
+    def OnlineRectificationDecoratedProblem_Decorator(EllipticOptimalControlProblem_DerivedClass): #EllipticOptimalControlProblem_DerivedClass
         # return value (a class) for the decorator
-        return EllipticOptimalControlProblem_DerivedClass #EllipticCoerciveProblem_DerivedClass
+        return EllipticOptimalControlProblem_DerivedClass #EllipticOptimalControlProblem_DerivedClass
 
     # return the decorator itself
     return OnlineRectificationDecoratedProblem_Decorator

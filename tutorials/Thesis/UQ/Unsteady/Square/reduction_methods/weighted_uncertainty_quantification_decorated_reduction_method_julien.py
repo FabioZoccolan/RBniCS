@@ -28,19 +28,19 @@ from rbnics.utils.io import ExportableList
 logger = getLogger("tutorials/Tesi/02_elliptic_ocp_weighted_poisson/reduction_methods/weighted_uncertainty_quantification_decorated_reduction_method.py")
 
 @ReductionMethodDecoratorFor(WeightedUncertaintyQuantification)
-def WeightedUncertaintyQuantificationDecoratedReductionMethod(EllipticCoerciveReductionMethod_DerivedClass):
+def WeightedUncertaintyQuantificationDecoratedReductionMethod(EllipticOptimalControlReductionMethod_DerivedClass):
     
     @PreserveClassName
-    class WeightedUncertaintyQuantificationDecoratedReductionMethod_Class_Base(EllipticCoerciveReductionMethod_DerivedClass):
+    class WeightedUncertaintyQuantificationDecoratedReductionMethod_Class_Base(EllipticOptimalControlReductionMethod_DerivedClass):
         def __init__(self, truth_problem, **kwargs):
-            EllipticCoerciveReductionMethod_DerivedClass.__init__(self, truth_problem, **kwargs)
+            EllipticOptimalControlReductionMethod_DerivedClass.__init__(self, truth_problem, **kwargs)
             self.weight = None
             self.training_set_density = None
             self.weight_List_reading = ExportableList("text")
             self.typeGrid = 0
             
         def initialize_training_set(self, ntrain, enable_import=True, sampling=None, weight=None, typeGrid=0, order_flag=False, **kwargs):
-            import_successful = EllipticCoerciveReductionMethod_DerivedClass.initialize_training_set(self, ntrain, enable_import, sampling, typeGrid, order_flag, **kwargs)
+            import_successful = EllipticOptimalControlReductionMethod_DerivedClass.initialize_training_set(self, ntrain, enable_import, sampling, typeGrid, order_flag, **kwargs)
             self.typeGrid = typeGrid
             if (self.typeGrid != 0):
                 self.weight_List_reading.load(self.folder["training_set"],"training_set_weight")
@@ -68,9 +68,9 @@ def WeightedUncertaintyQuantificationDecoratedReductionMethod(EllipticCoerciveRe
                 else:
                     self.training_set_density = {mu: 1. for mu in tranining_set_and_first_mu}
             # Call Parent method
-            EllipticCoerciveReductionMethod_DerivedClass._offline(self) 
+            EllipticOptimalControlReductionMethod_DerivedClass._offline(self) 
             
-    if hasattr(EllipticCoerciveReductionMethod_DerivedClass, "greedy"): # RB reduction
+    if hasattr(EllipticOptimalControlReductionMethod_DerivedClass, "greedy"): # RB reduction
         @PreserveClassName
         class WeightedUncertaintyQuantificationDecoratedReductionMethod_Class(WeightedUncertaintyQuantificationDecoratedReductionMethod_Class_Base):
             def _greedy(self):

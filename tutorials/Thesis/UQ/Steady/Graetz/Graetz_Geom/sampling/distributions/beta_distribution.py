@@ -24,4 +24,6 @@ class BetaDistribution(CompositeDistribution):
         assert isinstance(a, (list, tuple))
         assert isinstance(b, (list, tuple))
         assert len(a) == len(b)
+        print("**Initializing BetaDistribution")
         CompositeDistribution.__init__(self, [DrawFrom(random.beta, a=a_p, b=b_p) for (a_p, b_p) in zip(a, b)], 'GaussJacobi', is_loguniform=False) #, 'HaltonBeta', is_loguniform=False)
+        print("**Finished initializing BetaDistribution")

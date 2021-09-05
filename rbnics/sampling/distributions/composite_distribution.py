@@ -11,7 +11,7 @@ from rbnics.sampling.distributions.equispaced_distribution import EquispacedDist
 class CompositeDistribution(Distribution):
     def __init__(self, distributions, typedistribution, is_loguniform):
     
-        print("CompositeDistribution has been initialized. Parameters are") #added
+        print("\nCompositeDistribution has been initialized (__init__). Parameters are:") #added
         
         self.is_loguniform = is_loguniform #added
         self.distributions = distributions
@@ -29,6 +29,7 @@ class CompositeDistribution(Distribution):
             if distribution not in self.distribution_to_components:
                 self.distribution_to_components[distribution] = list()
             self.distribution_to_components[distribution].append(p)
+        print("Finished CompositeDistribution (__init__)\n")
 
 
     def sample(self, box, n, sparse_flag=False, order_flag=0): #added
@@ -99,3 +100,5 @@ class CompositeDistribution(Distribution):
             return set_, weights
         else:
             return set_
+            
+        

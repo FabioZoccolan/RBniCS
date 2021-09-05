@@ -13,10 +13,10 @@ from problems import OnlineVanishingViscosity
 
 
 @ReductionMethodDecoratorFor(OnlineVanishingViscosity)
-def OnlineVanishingViscosityDecoratedReductionMethod(EllipticCoerciveReductionMethod_DerivedClass):
+def OnlineVanishingViscosityDecoratedReductionMethod(EllipticOptimalControlReductionMethod_DerivedClass):
 
     @PreserveClassName
-    class OnlineVanishingViscosityDecoratedReductionMethod_Class(EllipticCoerciveReductionMethod_DerivedClass):
+    class OnlineVanishingViscosityDecoratedReductionMethod_Class(EllipticOptimalControlReductionMethod_DerivedClass):
 
         def _offline(self):
             # Change default online solve arguments during offline stage to use online stabilization
@@ -27,7 +27,7 @@ def OnlineVanishingViscosityDecoratedReductionMethod(EllipticCoerciveReductionMe
                 **self.reduced_problem._online_solve_default_kwargs)
 
             # Call standard offline phase
-            EllipticCoerciveReductionMethod_DerivedClass._offline(self)
+            EllipticOptimalControlReductionMethod_DerivedClass._offline(self)
 
             # Start vanishing viscosity postprocessing
             print(TextBox(self.truth_problem.name() + " " + self.label

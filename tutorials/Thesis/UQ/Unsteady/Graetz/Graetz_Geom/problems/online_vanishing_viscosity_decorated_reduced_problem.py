@@ -14,14 +14,14 @@ from .online_vanishing_viscosity import OnlineVanishingViscosity
 
 
 @ReducedProblemDecoratorFor(OnlineVanishingViscosity)
-def OnlineVanishingViscosityDecoratedReducedProblem(EllipticCoerciveReducedProblem_DerivedClass):
+def OnlineVanishingViscosityDecoratedReducedProblem(EllipticOptimalControlReducedProblem_DerivedClass):
 
     @PreserveClassName
-    class OnlineVanishingViscosityDecoratedReducedProblem_Class(EllipticCoerciveReducedProblem_DerivedClass):
+    class OnlineVanishingViscosityDecoratedReducedProblem_Class(EllipticOptimalControlReducedProblem_DerivedClass):
 
         def __init__(self, truth_problem, **kwargs):
             # Call to parent
-            EllipticCoerciveReducedProblem_DerivedClass.__init__(self, truth_problem, **kwargs)
+            EllipticOptimalControlReducedProblem_DerivedClass.__init__(self, truth_problem, **kwargs)
 
             # Store vanishing viscosity data
             self._viscosity = truth_problem._viscosity
@@ -57,7 +57,7 @@ def OnlineVanishingViscosityDecoratedReducedProblem(EllipticCoerciveReducedProbl
                 self.assemble_operator("vanishing_viscosity", "online")
             elif current_stage == "offline":
                 # Call Parent
-                EllipticCoerciveReducedProblem_DerivedClass._init_operators(self, current_stage)
+                EllipticOptimalControlReducedProblem_DerivedClass._init_operators(self, current_stage)
             elif current_stage == "offline_vanishing_viscosity_postprocessing":
                 # Initialize additional truth operators
                 self.truth_problem.operator["k"] = AffineExpansionStorage(self.truth_problem.assemble_operator("k"))
@@ -70,7 +70,7 @@ def OnlineVanishingViscosityDecoratedReducedProblem(EllipticCoerciveReducedProbl
                 self.operator["vanishing_viscosity"] = OnlineNonHierarchicalAffineExpansionStorage(1)
             else:
                 # Call Parent, which may eventually raise an error
-                EllipticCoerciveReducedProblem_DerivedClass._init_operators(self, current_stage)
+                EllipticOptimalControlReducedProblem_DerivedClass._init_operators(self, current_stage)
 
         def _init_inner_products(self, current_stage="online"):
             # The difference between this method and the parent one is that non-hierarchical affine
@@ -83,26 +83,26 @@ def OnlineVanishingViscosityDecoratedReducedProblem(EllipticCoerciveReducedProbl
                 self.assemble_operator("projection_inner_product", "online")
                 self._disable_inner_product_combination = True
             elif current_stage == "offline":
-                EllipticCoerciveReducedProblem_DerivedClass._init_inner_products(self, current_stage)
+                EllipticOptimalControlReducedProblem_DerivedClass._init_inner_products(self, current_stage)
             elif current_stage == "offline_vanishing_viscosity_postprocessing":
                 self.inner_product = OnlineNonHierarchicalAffineExpansionStorage(1)
                 self.projection_inner_product = OnlineNonHierarchicalAffineExpansionStorage(1)
                 self._disable_inner_product_combination = True
             else:
                 # Call Parent, which may eventually raise an error
-                EllipticCoerciveReducedProblem_DerivedClass._init_inner_products(self, current_stage)
+                EllipticOptimalControlReducedProblem_DerivedClass._init_inner_products(self, current_stage)
 
         def _combine_all_inner_products(self):
             if self._disable_inner_product_combination:
                 return NotImplemented
             else:
-                return EllipticCoerciveReducedProblem_DerivedClass._combine_all_inner_products(self)
+                return EllipticOptimalControlReducedProblem_DerivedClass._combine_all_inner_products(self)
 
         def _combine_all_projection_inner_products(self):
             if self._disable_inner_product_combination:
                 return NotImplemented
             else:
-                return EllipticCoerciveReducedProblem_DerivedClass._combine_all_projection_inner_products(self)
+                return EllipticOptimalControlReducedProblem_DerivedClass._combine_all_projection_inner_products(self)
 
         def _init_basis_functions(self, current_stage="online"):
             if current_stage == "online":
@@ -114,13 +114,13 @@ def OnlineVanishingViscosityDecoratedReducedProblem(EllipticCoerciveReducedProbl
                     self.N = len(self.basis_functions)
                     self.N_bc = 0  # TODO handle inhomogeneous bcs
             elif current_stage == "offline":
-                EllipticCoerciveReducedProblem_DerivedClass._init_basis_functions(self, current_stage)
+                EllipticOptimalControlReducedProblem_DerivedClass._init_basis_functions(self, current_stage)
             elif current_stage == "offline_vanishing_viscosity_postprocessing":
                 self.basis_functions = NonHierarchicalBasisFunctionsMatrix(self.truth_problem.V)
                 self.basis_functions.init(self.truth_problem.components)
             else:
                 # Call Parent, which may eventually raise an error
-                EllipticCoerciveReducedProblem_DerivedClass._init_basis_functions(self, current_stage)
+                EllipticOptimalControlReducedProblem_DerivedClass._init_basis_functions(self, current_stage)
 
         def _init_error_estimation_operators(self, current_stage="online"):
             if current_stage in ("online", "offline_vanishing_viscosity_postprocessing"):
@@ -129,14 +129,14 @@ def OnlineVanishingViscosityDecoratedReducedProblem(EllipticCoerciveReducedProbl
                 self._disable_error_estimation = True
             elif current_stage == "offline":
                 # Call Parent
-                EllipticCoerciveReducedProblem_DerivedClass._init_error_estimation_operators(self, current_stage)
+                EllipticOptimalControlReducedProblem_DerivedClass._init_error_estimation_operators(self, current_stage)
             else:
                 # Call Parent, which may eventually raise an error
-                EllipticCoerciveReducedProblem_DerivedClass._init_error_estimation_operators(self, current_stage)
+                EllipticOptimalControlReducedProblem_DerivedClass._init_error_estimation_operators(self, current_stage)
 
         def build_reduced_operators(self, current_stage="offline"):
             if current_stage == "offline_vanishing_viscosity_postprocessing":
-                EllipticCoerciveReducedProblem_DerivedClass.build_reduced_operators(
+                EllipticOptimalControlReducedProblem_DerivedClass.build_reduced_operators(
                     self, "offline_vanishing_viscosity_postprocessing")
                 # Compute vanishing viscosity reduced operator
                 print("build vanishing viscosity reduced operator")
@@ -144,7 +144,7 @@ def OnlineVanishingViscosityDecoratedReducedProblem(EllipticCoerciveReducedProbl
                     "vanishing_viscosity", "offline_vanishing_viscosity_postprocessing")
             else:
                 # Call Parent, which may eventually raise an error
-                EllipticCoerciveReducedProblem_DerivedClass.build_reduced_operators(self, current_stage)
+                EllipticOptimalControlReducedProblem_DerivedClass.build_reduced_operators(self, current_stage)
 
         def assemble_operator(self, term, current_stage="online"):
             if term == "vanishing_viscosity":
@@ -242,10 +242,10 @@ def OnlineVanishingViscosityDecoratedReducedProblem(EllipticCoerciveReducedProbl
                     else:
                         raise ValueError("Invalid term for assemble_operator().")
                 else:
-                    return EllipticCoerciveReducedProblem_DerivedClass.assemble_operator(self, term, current_stage)
+                    return EllipticOptimalControlReducedProblem_DerivedClass.assemble_operator(self, term, current_stage)
 
         def _online_size_from_kwargs(self, N, **kwargs):
-            N, kwargs = EllipticCoerciveReducedProblem_DerivedClass._online_size_from_kwargs(self, N, **kwargs)
+            N, kwargs = EllipticOptimalControlReducedProblem_DerivedClass._online_size_from_kwargs(self, N, **kwargs)
             kwargs = self.OnlineSolveKwargs(**kwargs)
             return N, kwargs
 
@@ -266,7 +266,7 @@ def OnlineVanishingViscosityDecoratedReducedProblem(EllipticCoerciveReducedProbl
                 solver.set_parameters(self._linear_solver_parameters)
                 solver.solve()
             else:
-                EllipticCoerciveReducedProblem_DerivedClass._solve(self, N, **kwargs)
+                EllipticOptimalControlReducedProblem_DerivedClass._solve(self, N, **kwargs)
             # Restore original value of stabilized attribute in truth problem
             self.truth_problem.stabilized = bak_stabilized
 
@@ -274,7 +274,7 @@ def OnlineVanishingViscosityDecoratedReducedProblem(EllipticCoerciveReducedProbl
             if self._disable_error_estimation:
                 return NotImplemented
             else:
-                return EllipticCoerciveReducedProblem_DerivedClass.estimate_error(self)
+                return EllipticOptimalControlReducedProblem_DerivedClass.estimate_error(self)
 
     # return value (a class) for the decorator
     return OnlineVanishingViscosityDecoratedReducedProblem_Class

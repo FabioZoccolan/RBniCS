@@ -63,9 +63,9 @@ class ParameterSpaceSubset(ExportableList): # equivalent to a list of tuples
                 print("I am now in param_space_subset.generate() for typgrid!=0")
                 print("run_sampling=", run_sampling)
                 self._list, weight = parallel_generate(run_sampling, self.mpi_comm)
-                '''
+                
                 print("the weights have been assigned succesfully")
-                import numpy as np
+                """import numpy as np
                 import matplotlib.pyplot as plt
                 from mpl_toolkits.mplot3d import Axes3D
                 x=np.ones(len(self._list))
@@ -84,8 +84,8 @@ class ParameterSpaceSubset(ExportableList): # equivalent to a list of tuples
                 ax.set_ylabel('Y Label')
                 plt.show()  
                 import sys
-                sys.exit()
-                '''
+                sys.exit()"""
+                
                 self.weight.extend(weight)
             else:
                 self._list = parallel_generate(run_sampling, self.mpi_comm)

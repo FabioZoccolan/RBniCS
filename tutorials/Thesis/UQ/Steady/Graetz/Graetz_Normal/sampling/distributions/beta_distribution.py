@@ -21,7 +21,10 @@ from rbnics.sampling.distributions import CompositeDistribution, DrawFrom
 
 class BetaDistribution(CompositeDistribution):
     def __init__(self, a, b):
+        print("Initializing BetaDistribution")
         assert isinstance(a, (list, tuple))
         assert isinstance(b, (list, tuple))
         assert len(a) == len(b)
-        CompositeDistribution.__init__(self, [DrawFrom(random.beta, a=a_p, b=b_p) for (a_p, b_p) in zip(a, b)], 'GaussJacobi', is_loguniform=False) #'HaltonBeta'
+        
+        CompositeDistribution.__init__(self, [DrawFrom(random.beta, a=a_p, b=b_p) for (a_p, b_p) in zip(a, b)], 'HaltonBeta', is_loguniform=False) #'GaussJacobi'
+        print("Finished initializing BetaDistribution \n")

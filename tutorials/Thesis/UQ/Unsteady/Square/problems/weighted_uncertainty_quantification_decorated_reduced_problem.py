@@ -20,6 +20,6 @@ from rbnics.utils.decorators import ReducedProblemDecoratorFor
 from .weighted_uncertainty_quantification import WeightedUncertaintyQuantification
 
 @ReducedProblemDecoratorFor(WeightedUncertaintyQuantification)
-def WeightedUncertaintyQuantificationDecoratedReducedProblem(EllipticCoerciveReducedProblem_DerivedClass):
+def WeightedUncertaintyQuantificationDecoratedReducedProblem(EllipticOptimalControlReducedProblem_DerivedClass):
     # return value (a class) for the decorator
-    return EllipticCoerciveReducedProblem_DerivedClass
+    return EllipticOptimalControlReducedProblem_DerivedClass

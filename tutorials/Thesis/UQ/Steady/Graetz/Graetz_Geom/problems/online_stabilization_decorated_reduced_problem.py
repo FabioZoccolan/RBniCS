@@ -11,20 +11,20 @@ from .online_stabilization import OnlineStabilization
 
 
 @ReducedProblemDecoratorFor(OnlineStabilization)
-def OnlineStabilizationDecoratedReducedProblem(EllipticCoerciveReducedProblem_DerivedClass):
+def OnlineStabilizationDecoratedReducedProblem(EllipticOptimalControlReducedProblem_DerivedClass):
 
     @PreserveClassName
-    class OnlineStabilizationDecoratedReducedProblem_Class(EllipticCoerciveReducedProblem_DerivedClass):
+    class OnlineStabilizationDecoratedReducedProblem_Class(EllipticOptimalControlReducedProblem_DerivedClass):
         def __init__(self, truth_problem, **kwargs):
             # Call to parent
-            EllipticCoerciveReducedProblem_DerivedClass.__init__(self, truth_problem, **kwargs)
+            EllipticOptimalControlReducedProblem_DerivedClass.__init__(self, truth_problem, **kwargs)
             # Default values for keyword arguments in solve
             self._online_solve_default_kwargs = OrderedDict()
             self._online_solve_default_kwargs["online_stabilization"] = True
             self.OnlineSolveKwargs = OnlineSolveKwargsGenerator(**self._online_solve_default_kwargs)
 
         def _online_size_from_kwargs(self, N, **kwargs):
-            N, kwargs = EllipticCoerciveReducedProblem_DerivedClass._online_size_from_kwargs(self, N, **kwargs)
+            N, kwargs = EllipticOptimalControlReducedProblem_DerivedClass._online_size_from_kwargs(self, N, **kwargs)
             kwargs = self.OnlineSolveKwargs(**kwargs)
             return N, kwargs
 
@@ -33,7 +33,7 @@ def OnlineStabilizationDecoratedReducedProblem(EllipticCoerciveReducedProblem_De
             bak_stabilized = self.truth_problem.stabilized
             self.truth_problem.stabilized = kwargs["online_stabilization"]
             # Solve reduced problem
-            EllipticCoerciveReducedProblem_DerivedClass._solve(self, N, **kwargs)
+            EllipticOptimalControlReducedProblem_DerivedClass._solve(self, N, **kwargs)
             # Restore original value of stabilized attribute in truth problem
             self.truth_problem.stabilized = bak_stabilized
 

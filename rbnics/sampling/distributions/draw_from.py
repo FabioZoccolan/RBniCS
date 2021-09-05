@@ -25,7 +25,7 @@ from rbnics.sampling.distributions import ausiliaryFunction as au
 
 class DrawFrom(Distribution):
     def __init__(self, generator, *args, **kwargs):
-        print("In __init__ of DrawFrom")
+        print("In __init__ of DrawFrom\n")
         print("generator of drawfrom is ", generator)
         self.generator = generator # of a distribution in [0, 1]  ->> prende una classe del tipo di distribuzione
         self.args = args
@@ -34,7 +34,8 @@ class DrawFrom(Distribution):
         print("so the keys are", kwargs.keys)
         for x in kwargs.keys():
             print(x)
-
+        print("\nFinished __init__ of DrawFrom")
+        
     def sample(self, box, n, typedistribution, typeGrid=0, order_flag=False, is_loguniform=False):     #typeGrid=0
         print("in drawfrom.sample")
         print("\n\n\norder_flag is:", order_flag)
@@ -177,4 +178,4 @@ class DrawFrom(Distribution):
             nodes = au.array2tuple(nodes,1)
             print("final nodes", nodes)
             return nodes, weights
-    
+        

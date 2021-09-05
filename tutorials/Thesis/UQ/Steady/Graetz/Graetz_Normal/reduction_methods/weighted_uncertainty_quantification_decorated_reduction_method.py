@@ -30,7 +30,8 @@ def WeightedUncertaintyQuantificationDecoratedReductionMethod(EllipticCoerciveRe
     @PreserveClassName
     class WeightedUncertaintyQuantificationDecoratedReductionMethod_Class_Base(EllipticCoerciveReductionMethod_DerivedClass):
         def __init__(self, truth_problem, **kwargs):
-            print("WEIGHTED UQ CLASS INITIALIZED")
+            print("\nInitializing weighted_uncertainty_quantification_decorated_reduction_method\n")
+            print("\nWEIGHTED UQ CLASS INITIALIZED\n")
             EllipticCoerciveReductionMethod_DerivedClass.__init__(self, truth_problem, **kwargs)
             self.weight = None
             self.training_set_density = None

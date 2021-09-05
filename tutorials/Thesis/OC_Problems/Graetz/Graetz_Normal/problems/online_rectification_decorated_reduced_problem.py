@@ -15,10 +15,10 @@ from .online_rectification import OnlineRectification
 
 
 @ReducedProblemDecoratorFor(OnlineRectification)
-def OnlineRectificationDecoratedReducedProblem(EllipticOptimalControlProblem_DerivedClass): #EllipticCoerciveReducedProblem_DerivedClass):
+def OnlineRectificationDecoratedReducedProblem(EllipticOptimalControlProblem_DerivedClass): #EllipticOptimalControlReducedProblem_DerivedClass):
 
     @PreserveClassName
-    class OnlineRectificationDecoratedReducedProblem_Class(EllipticOptimalControlProblem_DerivedClass): #EllipticCoerciveReducedProblem_DerivedClass):
+    class OnlineRectificationDecoratedReducedProblem_Class(EllipticOptimalControlProblem_DerivedClass): #EllipticOptimalControlReducedProblem_DerivedClass):
         def __init__(self, truth_problem, **kwargs):
             # Call to parent
             EllipticOptimalControlProblem_DerivedClass.__init__(self, truth_problem, **kwargs)

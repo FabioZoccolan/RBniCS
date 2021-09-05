@@ -25,19 +25,19 @@ from problems import WeightedUncertaintyQuantification
 logger = getLogger("tutorials/Tesi/02_elliptic_ocp_weighted_poisson/reduction_methods/weighted_uncertainty_quantification_decorated_reduction_method.py")
 
 @ReductionMethodDecoratorFor(WeightedUncertaintyQuantification)
-def WeightedUncertaintyQuantificationDecoratedReductionMethod(EllipticCoerciveReductionMethod_DerivedClass):
+def WeightedUncertaintyQuantificationDecoratedReductionMethod(EllipticOptimalControlReductionMethod_DerivedClass):
     
     @PreserveClassName
-    class WeightedUncertaintyQuantificationDecoratedReductionMethod_Class_Base(EllipticCoerciveReductionMethod_DerivedClass):
+    class WeightedUncertaintyQuantificationDecoratedReductionMethod_Class_Base(EllipticOptimalControlReductionMethod_DerivedClass):
         def __init__(self, truth_problem, **kwargs):
             print("WEIGHTED UQ CLASS INITIALIZED")
-            EllipticCoerciveReductionMethod_DerivedClass.__init__(self, truth_problem, **kwargs)
+            EllipticOptimalControlReductionMethod_DerivedClass.__init__(self, truth_problem, **kwargs)
             self.weight = None
             self.training_set_density = None
             
         def initialize_training_set(self, ntrain, enable_import=True, sampling=None, weight=None, **kwargs):
             print("\n*Started initialize_training_set of WeightedUQ class\n")
-            import_successful = EllipticCoerciveReductionMethod_DerivedClass.initialize_training_set(self, ntrain, enable_import, sampling, **kwargs)
+            import_successful = EllipticOptimalControlReductionMethod_DerivedClass.initialize_training_set(self, ntrain, enable_import, sampling, **kwargs)
             print("\n**Finished initialize_training_set of WeightedUQ class")
             self.weight = weight
             return import_successful
@@ -55,10 +55,10 @@ def WeightedUncertaintyQuantificationDecoratedReductionMethod(EllipticCoerciveRe
                 self.training_set_density = {mu: 1. for mu in tranining_set_and_first_mu}
             
             # Call Parent method
-            EllipticCoerciveReductionMethod_DerivedClass._offline(self)
+            EllipticOptimalControlReductionMethod_DerivedClass._offline(self)
             print("**WeightedUQ._offline::finished")
             
-    if hasattr(EllipticCoerciveReductionMethod_DerivedClass, "greedy"): # RB reduction
+    if hasattr(EllipticOptimalControlReductionMethod_DerivedClass, "greedy"): # RB reduction
         @PreserveClassName
         class WeightedUncertaintyQuantificationDecoratedReductionMethod_Class(WeightedUncertaintyQuantificationDecoratedReductionMethod_Class_Base):
             def _greedy(self):

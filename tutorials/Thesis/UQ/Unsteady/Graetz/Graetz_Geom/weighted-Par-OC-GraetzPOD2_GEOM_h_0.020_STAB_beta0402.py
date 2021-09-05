@@ -409,7 +409,7 @@ print("Dim: ", block_V.dim() )
 
 # 3. Allocate an object of the EllipticOptimalControl class
 elliptic_optimal_control = EllipticOptimalControl(block_V, subdomains=subdomains, boundaries=boundaries, T=T, dt=dt, Nt=Nt)
-mu_range =  [(0.01, 1e6), (0.5, 4.0)]
+mu_range =  [(1, 1e6), (0.5, 4.0)]
 elliptic_optimal_control.set_mu_range(mu_range)
 beta_a = [4 for _ in range(2)]
 beta_b = [2 for _ in range(2)]
