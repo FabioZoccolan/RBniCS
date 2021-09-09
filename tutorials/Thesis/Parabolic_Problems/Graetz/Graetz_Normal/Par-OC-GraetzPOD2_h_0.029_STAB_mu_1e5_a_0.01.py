@@ -36,7 +36,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         #self.lifting = Expression('((x[0] >= 1 && x[0] <= 2) && (x[1] == 1.0 || x[1]== 0.0) ) ? 1. : 0.', degree=1, domain=mesh)
         
         
-        self.y_0 = Expression("1.0*((x[0] >= 1 && x[0] <= 2) && (x[1] == 1.0 || x[1]== 0.0))", degree=1, domain=mesh) #self.y_0 = Expression("1.0-1.0*(x[0]==0)-1.0*( x[0] <= 1)*(x[1]==0)-1.0*(x[0] <= 1)*( x[1]==1) ", degree=1, domain=mesh)
+        self.y_0 = Constant("0.0") #Expression("1.0*((x[0] >= 1 && x[0] <= 2) && (x[1] == 1.0 || x[1]== 0.0))", degree=1, domain=mesh) #self.y_0 = Expression("1.0-1.0*(x[0]==0)-1.0*( x[0] <= 1)*(x[1]==0)-1.0*(x[0] <= 1)*( x[1]==1) ", degree=1, domain=mesh)
         
         
         self.delta = 2.0
