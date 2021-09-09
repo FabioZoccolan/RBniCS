@@ -43,17 +43,17 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         (self.y, self.u, self.p) = block_split(block_yup)
         block_zvq = BlockTestFunction(block_V)
         (self.z, self.v, self.q) = block_split(block_zvq)
-        self.dx = Measure("dx")(subdomain_data=subdomains)
-        self.ds = Measure("ds")(subdomain_data=boundaries)
+        self.dx = Measure("dx")(subdomain_data=self.subdomains)
+        self.ds = Measure("ds")(subdomain_data=self.boundaries)
         
         # Regularization coefficient
-        self.alpha = 0.0001
-        self.y_d = Constant(1.0)
+        self.alpha = 0.01
+        self.y_d = Constant(4.0)
         
         # Store the velocity expression
         self.vel = Expression("x[1] * (1 - x[1])", degree=1, domain=mesh)
   
-        self.f_0 = Constant(1.0)
+        self.f_0 = Constant(0.0)
         
         self.delta = 1.0
         self.h = CellDiameter(block_V.mesh())
@@ -85,10 +85,10 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         elif term in ("c", "c*"):
             theta_c0 = 1.0
             if self.stabilized:
-               delta = self.delta
-               theta_c1 = delta
+              delta = self.delta
+              theta_c1 = delta
             else:
-               theta_c1 = 0.0
+              theta_c1 = 0.0
             return (theta_c0,theta_c1)
         elif term == "m":
             theta_m0 = 1.0
@@ -100,9 +100,14 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             return (theta_m0, theta_m1)
         elif term == "n":
             theta_n0 = self.alpha
-            return (theta_n0,)
+            if self.stabilized:
+               delta = self.delta
+               theta_n1 = 0.0 #delta * self.alpha
+            else:
+               theta_n1 = 0.0
+            return (theta_n0, theta_n1)
         elif term == "f":
-            theta_f0 = 0.0
+            theta_f0 = 1.0
             return (theta_f0, )
         elif term == "g":
             theta_g0 = 1.
@@ -157,20 +162,20 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             u = self.u
             q = self.q
             h = self.h
-            c0_0 = u*q*ds(7)
-            c1_0 = h * u * q.dx(0) * ds(7)
+            c0_0 = u*q*ds(2)
+            c1_0 = h * u * q.dx(0) * ds(2)
             c0 = [[0, 0, 0], [0, 0, 0], [0, c0_0, 0]]
             c1 = [[0, 0, 0], [0, 0, 0], [0, c1_0, 0]]
-            return(BlockForm(c0),BlockForm(c1))
+            return (BlockForm(c0),BlockForm(c1))
         elif term == "c*":
             v = self.v
             p = self.p
             h = self.h
-            cs0_0 = p*v*ds(7)
-            cs1_0 = Constant(0.0) * - h * v.dx(0) * p * ds(7)
+            cs0_0 = p*v*ds(2)
+            cs1_0 = Constant(0.0) * - h * v.dx(0) * p * ds(2)
             cs0 = [[0, 0, 0], [0, 0, cs0_0], [0, 0, 0]]
             cs1 = [[0, 0, 0], [0, 0, cs1_0], [0, 0, 0]]
-            return(BlockForm(cs0),BlockForm(cs1))
+            return (BlockForm(cs0),BlockForm(cs1))
         elif term == "m":
             y = self.y
             z = self.z
@@ -184,9 +189,11 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             u = self.u
             v = self.v
             h = self.h
-            n0_0 = u*v*ds(7)
+            n0_0 = u* v *ds(2)
+            n1_0 = -h * u * v.dx(0) * ds(2)
             n0 = [[0, 0, 0], [0, n0_0, 0], [0, 0, 0]]
-            return (BlockForm(n0),)
+            n1 = [[0, 0, 0], [0, n1_0, 0], [0, 0, 0]]
+            return (BlockForm(n0),BlockForm(n1))
         elif term == "f":
             q = self.q
             f_0 = self.f_0
@@ -207,18 +214,14 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             h0 = y_d * y_d * dx(3, domain=mesh) + y_d * y_d * dx(4, domain=mesh)  #RICONTROLLARE
             return (h0,)
         elif term == "dirichlet_bc_y":
-            bc0 = BlockDirichletBC([[DirichletBC(block_V.sub(0), Constant(0.0), self.boundaries, 1),
-                   DirichletBC(block_V.sub(0), Constant(1.0), self.boundaries, 2),
+            bc0 = BlockDirichletBC([[DirichletBC(block_V.sub(0), Constant(1.0), self.boundaries, 1),
                    DirichletBC(block_V.sub(0), Constant(1.0), self.boundaries, 4),
-                   DirichletBC(block_V.sub(0), Constant(0.0), self.boundaries, 5),
-                   DirichletBC(block_V.sub(0), Constant(0.0), self.boundaries, 6)], None, None])
+                   DirichletBC(block_V.sub(0), Constant(1.0), self.boundaries, 5)], None, None])
             return (bc0,)
         elif term == "dirichlet_bc_p":
             bc0 = BlockDirichletBC([None, None, [DirichletBC(block_V.sub(2), Constant(0.0), self.boundaries, 1),
-                   DirichletBC(block_V.sub(2), Constant(0.0), self.boundaries, 2),
                    DirichletBC(block_V.sub(2), Constant(0.0), self.boundaries, 4),
-                   DirichletBC(block_V.sub(2), Constant(0.0), self.boundaries, 5),
-                   DirichletBC(block_V.sub(2), Constant(0.0), self.boundaries, 6)]] )
+                   DirichletBC(block_V.sub(2), Constant(0.0), self.boundaries, 5)]] )
             return (bc0,)
         elif term == "inner_product_y":
             y = self.y
@@ -229,7 +232,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         elif term == "inner_product_u":
             u = self.u
             v = self.v
-            x0_u = u* v *ds(7)
+            x0_u = u* v *ds(2)
             x0 = [[0, 0, 0], [0, x0_u, 0], [0, 0, 0]]
             return (BlockForm(x0),)
         elif term == "inner_product_p":
@@ -270,10 +273,10 @@ print("Dim: ", block_V.dim() )
 
 # 3. Allocate an object of the EllipticOptimalControl class
 elliptic_optimal_control = EllipticOptimalControl(block_V, subdomains=subdomains, boundaries=boundaries)
-mu_range =  [(1e3, 1e6)]
+mu_range =  [(1, 1e6)]
 elliptic_optimal_control.set_mu_range(mu_range)
 
-offline_mu = (1e4,)
+offline_mu = (1000,)
 elliptic_optimal_control.init()
 elliptic_optimal_control.set_mu(offline_mu)
 elliptic_optimal_control.solve()

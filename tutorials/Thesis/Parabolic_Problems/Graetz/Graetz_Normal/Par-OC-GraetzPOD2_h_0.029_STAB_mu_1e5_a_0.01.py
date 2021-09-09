@@ -36,7 +36,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         #self.lifting = Expression('((x[0] >= 1 && x[0] <= 2) && (x[1] == 1.0 || x[1]== 0.0) ) ? 1. : 0.', degree=1, domain=mesh)
         
         
-        self.y_0 = Expression("1.0", degree=1, domain=mesh) #self.y_0 = Expression("1.0-1.0*(x[0]==0)-1.0*( x[0] <= 1)*(x[1]==0)-1.0*(x[0] <= 1)*( x[1]==1) ", degree=1, domain=mesh)
+        self.y_0 = Expression("1.0*((x[0] >= 1 && x[0] <= 2) && (x[1] == 1.0 || x[1]== 0.0))", degree=1, domain=mesh) #self.y_0 = Expression("1.0-1.0*(x[0]==0)-1.0*( x[0] <= 1)*(x[1]==0)-1.0*(x[0] <= 1)*( x[1]==1) ", degree=1, domain=mesh)
         
         
         self.delta = 2.0
@@ -297,7 +297,7 @@ boundaries = MeshFunction("size_t", mesh, "data/graetzOC_h_0.029_facet_region.xm
 print("hMax: ", mesh.hmax() )
 
 # Create Finite Element space (Lagrange P1)
-T = 3.0
+T = 1.0
 dt = 0.5
 Nt = int(ceil(T/dt))
 

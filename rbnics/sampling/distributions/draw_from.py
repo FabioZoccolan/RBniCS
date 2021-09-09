@@ -42,7 +42,7 @@ class DrawFrom(Distribution):
         #print("is_loguniform=", self.kwargs["is_loguniform"])
         print("box=", box)
         if (typeGrid == 0 and is_loguniform == False):
-            # print("In typeGrid==0: Montecarlo") #added
+            print("In typeGrid==0 and is_loguniform == False") #added
             set_ = list() # of tuples
             for i in range(n):
                 mu = list() # of numbers
@@ -58,7 +58,7 @@ class DrawFrom(Distribution):
             return set_
 
         if (typeGrid == 0 and is_loguniform == True):
-            print("In typeGrid==0: Montecarlo") #added
+            print("In typeGrid==0 and is_loguniform == True") #added
             print("is_loguniform=", is_loguniform)
             set_ = list() # of tuples
             for i in range(n):

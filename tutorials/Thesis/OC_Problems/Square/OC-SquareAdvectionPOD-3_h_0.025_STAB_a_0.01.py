@@ -28,7 +28,8 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         # Desired state
         self.y_d = Constant(0.5)
         
-        self.delta = 2.1
+        self.delta = 1.0
+        
         self.h = CellDiameter(V.mesh())
         
         self.bc1 = Constant(1.0)
@@ -242,7 +243,7 @@ print("Dim: ", V.dim() )
 
 
 problem = EllipticOptimalControl(V, subdomains=subdomains, boundaries=boundaries)
-mu_range = [(1e4,1e5), (0.01, 6.3)]
+mu_range =[(1e4,1e5), (0.0, 1.57)]  # [(1e4,1e5), (0.0, 6.3)]
 problem.set_mu_range(mu_range)
 
 offline_mu = (2e4, 1.2)
@@ -258,7 +259,7 @@ problem.export_solution(filename="FEM_OC_Square3_h_0.025_STAB_mu_2.4_1.2_alpha_0
 # In[ ]:
 
 pod_galerkin_method = PODGalerkin(problem)
-pod_galerkin_method.set_Nmax(20)
+pod_galerkin_method.set_Nmax(50)
 
 # ### 4.5. Perform the offline phase
 
@@ -286,7 +287,7 @@ reduced_elliptic_optimal_control.export_error(filename="online_error_OC_Square3_
 reduced_solution = reduced_elliptic_optimal_control.solve(online_stabilization=True) 
 print("ONLINE STAB: Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
 reduced_elliptic_optimal_control.export_solution(filename="online_solution_OC_Square3_h_0.025_OffONSTAB_mu_2.4_1.2_alpha_0.01")
-reduced_elliptic_optimal_control.export_error(filename="online_error_OC_Square3_h_0.025_OffONSTAB_mu_mu_2.4_1.2_alpha_0.01")
+reduced_elliptic_optimal_control.export_error(filename="online_error_OC_Square3_h_0.025_OffONSTAB_mu_2.4_1.2_alpha_0.01")
 
 
 

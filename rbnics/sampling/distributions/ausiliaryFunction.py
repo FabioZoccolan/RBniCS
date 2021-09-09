@@ -3,7 +3,7 @@ import math as math
 from scipy import special
 from scipy.special import beta as bt
 import quadpy as quadpy
-# import ghalton as ghalton
+import ghalton as ghalton
 #import cs as Cs
 
 def d_tuples(d, q):
@@ -121,7 +121,7 @@ def HaltonRule(d, n, typedistribution, bounds, param, is_loguniform):
 
     weights = 1/n*np.prod(weights, axis=0)
     weights = list(weights)
-    print("HaltonRule computed nodes, weights = ", nodes, weights)
+    print("HaltonRule computed nodes, weights = ", nodes, weights, "\n")
     return nodes, weights
 
     
@@ -270,6 +270,7 @@ def transform_by_scaling(from_left, from_right, bounds, nodes, weights, distribu
         weights = weights*loguniform_density(to_left, to_right)(nodes)*(to_right-to_left)/(from_right-from_left)
     else :
         THIS_DISTRIBUTION_IS_NOT_KNOWN
+    print("Finished transfrom_by_scaling --returning nodes\n") #added
     return nodes, weights
 
 

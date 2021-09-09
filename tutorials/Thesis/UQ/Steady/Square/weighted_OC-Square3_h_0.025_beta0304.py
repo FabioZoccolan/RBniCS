@@ -31,7 +31,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         # Desired state
         self.y_d = Constant(0.5)
         
-        self.delta = 2.1
+        self.delta = 1.0
         self.h = CellDiameter(V.mesh())
         
         self.bc1 = Constant(1.0)
@@ -245,23 +245,25 @@ print("Dim: ", V.dim() )
 
 
 problem = EllipticOptimalControl(V, subdomains=subdomains, boundaries=boundaries)
-mu_range = [(1e4,5e5), (0.01, 6.3)]
+mu_range = [(1e4,1e5), (0.0, 1.57)]  # [(1e4,5e5), (0.01, 6.3)]
 problem.set_mu_range(mu_range)
+
 beta_a = [3 for _ in range(2)]
 beta_b = [4 for _ in range(2)]
 
-
+#beta_c = [4 for _ in range(1)]
+#beta_d = [2 for _ in range(1)]
 
 # ### 4.4. Prepare reduction with a reduced basis method
 
 # In[ ]:
 
 pod_galerkin_method = PODGalerkin(problem)
-pod_galerkin_method.set_Nmax(20)
+pod_galerkin_method.set_Nmax(50)
 
 ##Offline Phase
 
-pod_galerkin_method.initialize_training_set(100, sampling=(BetaDistribution(beta_a, beta_b)),weight=BetaWeight(beta_a, beta_b),typeGrid=2) 
+pod_galerkin_method.initialize_training_set(100, sampling=(BetaDistribution(beta_a, beta_b)),typeGrid=2) 
 reduced_elliptic_optimal_control = pod_galerkin_method.offline()
 
 

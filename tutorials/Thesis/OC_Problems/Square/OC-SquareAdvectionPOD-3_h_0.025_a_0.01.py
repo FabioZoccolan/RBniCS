@@ -186,7 +186,7 @@ print("Dim: ", V.dim() )
 
 
 problem = EllipticOptimalControl(V, subdomains=subdomains, boundaries=boundaries)
-mu_range = [(1e4,1e5), (0.0, 6.3)]
+mu_range =[(1e4,1e5), (0.0, 1.57)] #[(1e4,1e5), (0.0, 6.3)]
 problem.set_mu_range(mu_range)
 
 offline_mu = (2e4, 1.2)
@@ -202,7 +202,7 @@ problem.export_solution(filename="FEM_OC_Square3_h_0.025_mu_2.4_1.2_alpha_0.01")
 # In[ ]:
 
 pod_galerkin_method = PODGalerkin(problem)
-pod_galerkin_method.set_Nmax(20)
+pod_galerkin_method.set_Nmax(50)
 
 # ### 4.5. Perform the offline phase
 
