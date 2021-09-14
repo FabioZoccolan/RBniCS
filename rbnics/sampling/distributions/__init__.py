@@ -12,19 +12,14 @@ from rbnics.sampling.distributions.equispaced_distribution import EquispacedDist
 from rbnics.sampling.distributions.log_equispaced_distribution import LogEquispacedDistribution
 from rbnics.sampling.distributions.log_uniform_distribution import LogUniformDistribution
 from rbnics.sampling.distributions.uniform_distribution import UniformDistribution
-from rbnics.sampling.distributions import ausiliaryFunction 
-from rbnics.sampling.distributions import smolyakGrid
-
 
 __all__ = [
-    'CompositeDistribution',
-    'DiscreteDistribution',
-    'Distribution',
-    'DrawFrom',
-    'EquispacedDistribution',
-    'LogEquispacedDistribution',
-    'LogUniformDistribution',
-    'UniformDistribution',
-    'smolyakGrid',
-    'ausiliaryFunction'
+    "CompositeDistribution",
+    "DiscreteDistribution",
+    "Distribution",
+    "DrawFrom",
+    "EquispacedDistribution",
+    "LogEquispacedDistribution",
+    "LogUniformDistribution",
+    "UniformDistribution"
 ]

@@ -7,11 +7,12 @@
 from .online_rectification_decorated_reduction_method import OnlineRectificationDecoratedReductionMethod
 from .online_stabilization_decorated_reduction_method import OnlineStabilizationDecoratedReductionMethod
 from .online_vanishing_viscosity_decorated_reduction_method import OnlineVanishingViscosityDecoratedReductionMethod
-from .weighted_uncertainty_quantification_decorated_reduction_method import WeightedUncertaintyQuantificationDecoratedReductionMethod
+from .weighted_uncertainty_quantification_decorated_reduction_method import (
+    WeightedUncertaintyQuantificationDecoratedReductionMethod)
 
 __all__ = [
-    'WeightedUncertaintyQuantificationDecoratedReductionMethod',
     "OnlineRectificationDecoratedReductionMethod",
     "OnlineStabilizationDecoratedReductionMethod",
-    "OnlineVanishingViscosityDecoratedReductionMethod"
+    "OnlineVanishingViscosityDecoratedReductionMethod",
+    "WeightedUncertaintyQuantificationDecoratedReductionMethod"
 ]

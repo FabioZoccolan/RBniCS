@@ -44,7 +44,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Return custom problem name
     def name(self):
-        return "UQ_OCGraetzPOD2_h_0.029_STAB_mu_1e5_alpha_0.01_beta0402_montecarlo"
+        return "Numerical_Results/Beta0402/UQ_OCGraetzPOD2_h_0.029_STAB_mu_1e5_alpha_0.01_beta0402_montecarlo"
 
     # Return theta multiplicative terms of the affine expansion of the problem.
     
@@ -244,7 +244,7 @@ pod_galerkin_method.set_Nmax(20) #20
 
 #Offline Phase
 
-pod_galerkin_method.initialize_training_set(100, sampling=BetaDistribution(beta_a, beta_b), typeGrid=0, enable_import=True)
+pod_galerkin_method.initialize_training_set(100, sampling=BetaDistribution(beta_a, beta_b), weight=BetaWeight(beta_a, beta_b))
 reduced_elliptic_optimal_control = pod_galerkin_method.offline()
 
 
@@ -297,7 +297,7 @@ print(dimONOFFSTAB, "\n")
 # In[ ]:
 
 
-pod_galerkin_method.initialize_testing_set(100, sampling=BetaDistribution(beta_a, beta_b), enable_import=True)
+pod_galerkin_method.initialize_testing_set(100, sampling=BetaDistribution(beta_a, beta_b))
 
 print("\n----------------------------------------OFFLINE STABILIZATION ERROR ANALYSIS BEGINS-------------------------------------------------\n")
 

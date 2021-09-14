@@ -2,7 +2,7 @@ from dolfin import *
 from rbnics import *
 from problems import *
 from reduction_methods import *
-#from rbnics.sampling.distributions import *
+from rbnics.sampling.distributions import *
 from reduction_methods import *
 from sampling.distributions import *
 from sampling.weights import *
@@ -44,7 +44,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Return custom problem name
     def name(self):
-        return "UQ_OCGraetzPOD2_h_0.029_STAB_mu_1e5_alpha_0.01_beta0401_montecarlo"
+        return "Numerical_Results/Beta0401/UQ_OCGraetzPOD2_h_0.029_STAB_mu_1e5_alpha_0.01_beta0401_montecarlo"
 
     # Return theta multiplicative terms of the affine expansion of the problem.
     
@@ -148,7 +148,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             y = self.y
             z = self.z
             h = self.h
-
+            
             m0 = y * z * dx(3) + y * z * dx(4)
             m1 = -h * y * z.dx(0) * dx(3) - h * y * z.dx(0) * dx(4)
             return (m0,m1)
@@ -230,7 +230,7 @@ print("Dim: ", V.dim() )
 """### 4.3. Allocate an object of the EllipticOptimalControl class"""
 
 problem = EllipticOptimalControl(V, subdomains=subdomains, boundaries=boundaries)
-mu_range = [(1, 2e5)] #[(1, 1e6)]
+mu_range = [(1, 2e5)] # [(1, 1e6)]
 problem.set_mu_range(mu_range)
 beta_a = [4 for _ in range(1)]
 beta_b = [1 for _ in range(1)]
@@ -244,7 +244,7 @@ pod_galerkin_method.set_Nmax(20) #20
 
 #Offline Phase
 
-pod_galerkin_method.initialize_training_set(100, sampling=BetaDistribution(beta_a, beta_b), typeGrid = 0, enable_import=True)
+pod_galerkin_method.initialize_training_set(100, sampling=BetaDistribution(beta_a, beta_b), weight=BetaWeight(beta_a, beta_b))
 reduced_elliptic_optimal_control = pod_galerkin_method.offline()
 
 
@@ -278,11 +278,18 @@ print("NOT ONLINE STAB: Reduced output for mu =", online_mu, "is", reduced_ellip
 reduced_elliptic_optimal_control.export_solution(filename="online_solution_UQ_OCGraetz2_h_0.029_OffSTAB_mu_1e5_alpha_0.01_beta0401_montecarlo")
 reduced_elliptic_optimal_control.export_error(filename="online_error_UQ_OCGraetz2_h_0.029_OffSTAB_mu_1e5_alpha_0.01_beta0401_montecarlo")
 
+dimOFFSTAB= reduced_solution.N
+print(dimOFFSTAB, "\n")
+
+
 reduced_solution = reduced_elliptic_optimal_control.solve(online_stabilization=True) 
 print("ONLINE STAB: Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
 reduced_elliptic_optimal_control.export_solution(filename="online_solution_UQ_OCGraetz2_h_0.029_OffONSTAB_mu_1e5_alpha_0.01_beta0401_montecarlo")
 reduced_elliptic_optimal_control.export_error(filename="online_error_UQ_OCGraetz2_h_0.029_OffONSTAB_mu_1e5_alpha_0.01_beta0401_montecarlo")
 
+
+dimONOFFSTAB= reduced_solution.N
+print(dimONOFFSTAB, "\n")
 
 
 # ### 4.7. Perform an error analysis
@@ -290,7 +297,7 @@ reduced_elliptic_optimal_control.export_error(filename="online_error_UQ_OCGraetz
 # In[ ]:
 
 
-pod_galerkin_method.initialize_testing_set(100, sampling=BetaDistribution(beta_a, beta_b), enable_import=True)
+pod_galerkin_method.initialize_testing_set(100, sampling=BetaDistribution(beta_a, beta_b))
 
 print("\n----------------------------------------OFFLINE STABILIZATION ERROR ANALYSIS BEGINS-------------------------------------------------\n")
 
