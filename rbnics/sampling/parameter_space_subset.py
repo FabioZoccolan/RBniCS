@@ -17,6 +17,7 @@ from rbnics.utils.mpi import parallel_io as parallel_generate, parallel_max
 
 class ParameterSpaceSubset(ExportableList):  # equivalent to a list of tuples
     def __init__(self):
+        print("In ParameterSpaceSubset __init__")
         ExportableList.__init__(self, "text")
         self.mpi_comm = COMM_WORLD
         self.distributed_max = True
@@ -34,8 +35,10 @@ class ParameterSpaceSubset(ExportableList):  # equivalent to a list of tuples
 
     # Method for generation of parameter space subsets
     def generate(self, box, n, sampling=None):
+        print("In ParameterSpaceSubset.generate")
         if len(box) > 0:
             if sampling is None:
+                print("We are using Uniform Distribution because sampling is not specified.")
                 sampling = UniformDistribution()
             elif isinstance(sampling, tuple):
                 assert len(sampling) == len(box)
@@ -48,6 +51,7 @@ class ParameterSpaceSubset(ExportableList):  # equivalent to a list of tuples
         else:
             for i in range(n):
                 self._list.append(tuple())
+        print("ParamaterSpaceSubset.generate::DONE")
 
     def max(self, generator, postprocessor=None):
         if postprocessor is None:

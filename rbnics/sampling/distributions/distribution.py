@@ -10,6 +10,7 @@ from abc import ABCMeta, abstractmethod
 class Distribution(object, metaclass=ABCMeta):
     @abstractmethod
     def sample(self, box, n):
+        print("sono in sampleee")
         raise NotImplementedError("The method sample is distribution-specific and needs to be overridden.")
 
     # Override the following methods to use a Distribution as a dict key

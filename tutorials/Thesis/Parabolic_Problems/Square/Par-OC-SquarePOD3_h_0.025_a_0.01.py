@@ -261,9 +261,9 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 ##### MAIN PROGRAM
 
 # Mesh
-mesh = Mesh("data/squareOC1_h_0.025.xml")
-subdomains = MeshFunction("size_t", mesh, "data/squareOC1_h_0.025_physical_region.xml")
-boundaries = MeshFunction("size_t", mesh, "data/squareOC1_h_0.025_facet_region.xml")
+mesh = Mesh("data/squareOC_h_0.036.xml")
+subdomains = MeshFunction("size_t", mesh, "data/squareOC_h_0.036_physical_region.xml")
+boundaries = MeshFunction("size_t", mesh, "data/squareOC_h_0.036_facet_region.xml")
 print("hMax: ", mesh.hmax() )
 
 # Create Finite Element space (Lagrange P1)

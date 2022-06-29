@@ -44,7 +44,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Return custom problem name
     def name(self):
-        return "AdvectionOCSquarePOD3_h_0.025_STAB_mu_2.4_1.2_alpha_0.01"
+        return "aArticle/AdvectionOCSquarePOD3_h_0.025_STAB_mu_2.4_1.2_alpha_0.01"
         
     # Return theta multiplicative terms of the affine expansion of the problem.
     def compute_theta(self, term):
@@ -108,6 +108,18 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             theta_h2 = 0.0
             theta_h3 = 1.0**2
             return (theta_h0, theta_h1, theta_h2,  theta_h3)
+        elif term == "m_o":
+            theta_m0 = 1.0
+            return (theta_m0,)
+        elif term == "n_o":
+            theta_n0 = self.alpha
+            return (theta_n0,)
+        elif term == "g_o":
+            theta_g0 = 0.0
+            theta_g1 = 0.0
+            theta_g2 = 0.0
+            theta_g3 = 1.0
+            return (theta_g0, theta_g1, theta_g2, theta_g3,)
         elif term == "dirichlet_bc_y":
             theta_bc0 = 1.
             return (theta_bc0,)
@@ -192,6 +204,29 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             h2 = y_d * y_d * dx(3, domain=mesh)
             h3 = y_d * y_d * dx(4, domain=mesh)
             return (h0, h1, h2, h3)
+        elif term == "m_o":
+            y = self.y
+            z = self.z
+            h = self.h
+            m0 = y * z * dx(4)
+
+            return (m0,)
+        elif term == "n_o":
+            u = self.u
+            v = self.v
+            h = self.h
+            n0 = u * v * dx
+            return (n0,)
+        elif term == "g_o":
+            z = self.z
+            y_d = self.y_d
+            h = self.h
+            g0 = y_d * z * dx(1)
+            g1 = y_d * z * dx(2)
+            g2 = y_d * z * dx(3)
+            g3 = y_d * z * dx(4)
+            
+            return (g0, g1, g2, g3)
         elif term == "dirichlet_bc_y":
             bc0 = [DirichletBC(self.V.sub(0), Constant(1.0), self.boundaries, 1),
                    DirichletBC(self.V.sub(0), Constant(0.0), self.boundaries, 2)]
@@ -217,6 +252,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             return (x0,)
         else:
             raise ValueError("Invalid term for assemble_operator().")
+
 
 
 # ## 4. Main program
@@ -284,10 +320,16 @@ print("NOT ONLINE STAB: Reduced output for mu =", online_mu, "is", reduced_ellip
 reduced_elliptic_optimal_control.export_solution(filename="online_solution_OC_Square3_h_0.025_OffSTAB_mu_2.4_1.2_alpha_0.01")
 reduced_elliptic_optimal_control.export_error(filename="online_error_OC_Square3_h_0.025_OffSTAB_mu_2.4_1.2_alpha_0.01")
 
+reduced_solution_N_2 = reduced_elliptic_optimal_control.solve(online_stabilization=False, N = 2) 
+reduced_elliptic_optimal_control.export_solution(filename="online_solution_OC_Square3_h_0.025_OffSTAB_mu_2.4_1.2_alpha_0.01_N_2")
+reduced_elliptic_optimal_control.export_error(filename="online_solution_OC_Square3_h_0.025_OffSTAB_mu_2.4_1.2_alpha_0.01_N_2")
+
 reduced_solution = reduced_elliptic_optimal_control.solve(online_stabilization=True) 
 print("ONLINE STAB: Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
 reduced_elliptic_optimal_control.export_solution(filename="online_solution_OC_Square3_h_0.025_OffONSTAB_mu_2.4_1.2_alpha_0.01")
 reduced_elliptic_optimal_control.export_error(filename="online_error_OC_Square3_h_0.025_OffONSTAB_mu_2.4_1.2_alpha_0.01")
+
+
 
 
 

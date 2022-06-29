@@ -22,6 +22,7 @@ class EllipticOptimalControlPODGalerkinReduction(EllipticOptimalControlPODGalerk
         # Carry out POD
         basis_functions = dict()
         N = dict()
+        print("elliptic_optimal_control_pod_galerkin_reduction:: self.truth_problem.components", self.truth_problem.components)
         for component in self.truth_problem.components:
             print("# POD for component", component)
             POD = self.POD[component]

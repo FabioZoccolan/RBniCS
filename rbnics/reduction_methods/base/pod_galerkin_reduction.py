@@ -26,6 +26,7 @@ def PODGalerkinReduction(DifferentialProblemReductionMethod_DerivedClass):
 
         def __init__(self, truth_problem, **kwargs):
             # Call the parent initialization
+            print("We are in POD Galerkin Reduction.init")
             DifferentialProblemReductionMethod_DerivedClass.__init__(self, truth_problem, **kwargs)
 
             # Declare a POD object
@@ -43,6 +44,7 @@ def PODGalerkinReduction(DifferentialProblemReductionMethod_DerivedClass):
                 self.tol = {component: 0. for component in self.truth_problem.components}
             else:
                 self.tol = 0.
+            print("We finished POD Galerkin Reduction.init")
 
         def set_tolerance(self, tol, **kwargs):
             """
@@ -86,12 +88,14 @@ def PODGalerkinReduction(DifferentialProblemReductionMethod_DerivedClass):
 
         def _init_offline(self):
             # Call parent to initialize inner product and reduced problem
+            print("Pod_Galerkin_Reduction._init_offline::called")
             output = DifferentialProblemReductionMethod_DerivedClass._init_offline(self)
 
             # Declare a new POD for each basis component
             if len(self.truth_problem.components) > 1:
                 self.POD = dict()
                 for component in self.truth_problem.components:
+                    print("Pod_Galerkin_Reduction._init_offline::component=", component)
                     assert len(self.truth_problem.inner_product[component]) == 1
                     # the affine expansion storage contains only the inner product matrix
                     inner_product = self.truth_problem.inner_product[component][0]
@@ -103,6 +107,7 @@ def PODGalerkinReduction(DifferentialProblemReductionMethod_DerivedClass):
                 self.POD = ProperOrthogonalDecomposition(self.truth_problem.V, inner_product)
 
             # Return
+            print("Exit::Pod_Galerkin_Reduction._init_offline")
             return output
 
         def offline(self):
@@ -111,11 +116,13 @@ def PODGalerkinReduction(DifferentialProblemReductionMethod_DerivedClass):
 
             :return: reduced_problem where all offline data are stored.
             """
+            print("\n\nPod_Galerkin_Reduction.offline::>>>>>>>>>>>>>>Started offline")
             need_to_do_offline_stage = self._init_offline()
             if need_to_do_offline_stage:
                 self._offline()
             self._finalize_offline()
             return self.reduced_problem
+            print("\n\nPod_Galerkin_Reduction.offline::>>>>>>>>>>>>>>Done offline")
 
         @snapshot_links_to_cache
         def _offline(self):
@@ -139,7 +146,8 @@ def PODGalerkinReduction(DifferentialProblemReductionMethod_DerivedClass):
 
             print(TextLine("perform POD", fill="#"))
             self.compute_basis_functions()
-
+            print("Succesfully computed the basis ")
+            
             print("")
             print("build reduced operators")
             self.reduced_problem.build_reduced_operators()
@@ -197,6 +205,9 @@ def PODGalerkinReduction(DifferentialProblemReductionMethod_DerivedClass):
 
         def _error_analysis(self, N_generator=None, filename=None, **kwargs):
             if N_generator is None:
+                print("In error analysis")
+                print("N_genertor=", N_generator)
+                print("kwargs=", kwargs)
                 def N_generator():
                     N = self.reduced_problem.N
                     if isinstance(N, dict):

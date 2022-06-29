@@ -29,7 +29,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         self.y_d = Constant(1.0)
         # Store the velocity expression
         self.vel = Expression("x[1] * (1 - x[1])", element=self.V.sub(0).ufl_element())
-        self.lifting = Expression('((x[0] >= 1 && x[0] <= 2) && (x[1] == 1.0 || x[1]== 0.0) ) ? 1. : 0.', degree=1, domain=mesh)
+        #self.lifting = Expression('((x[0] >= 1 && x[0] <= 2) && (x[1] == 1.0 || x[1]== 0.0) ) ? 1. : 0.', degree=1, domain=mesh)
         # Customize linear solver parameters
         self._linear_solver_parameters.update({
             "linear_solver": "mumps"
@@ -37,7 +37,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Return custom problem name
     def name(self):
-        return "AdvectionOCGraetzPOD2_h_0.029_mu_1e5_alpha_0.01"
+        return "Article/AdvectionOCGraetzPOD2_h_0.029_mu_1e5_alpha_0.01"
 
     # Return theta multiplicative terms of the affine expansion of the problem.
     def compute_theta(self, term):
@@ -214,6 +214,7 @@ reduced_elliptic_optimal_control.set_mu(online_mu)
 reduced_solution = reduced_elliptic_optimal_control.solve()
 print("Reduced output for mu =", online_mu, "is", reduced_elliptic_optimal_control.compute_output())
 reduced_elliptic_optimal_control.export_solution(filename="online_solution_OCGraetz2_h_0.029_mu_1e5_alpha_0.01")
+reduced_elliptic_optimal_control.export_error(filename="online_error_OCGraetz2_h_0.029_mu_1e5_alpha_0.01")
 
 # ### 4.7. Perform an error analysis
 
@@ -221,14 +222,14 @@ reduced_elliptic_optimal_control.export_solution(filename="online_solution_OCGra
 
 
 pod_galerkin_method.initialize_testing_set(100)
-pod_galerkin_method.error_analysis()
+pod_galerkin_method.error_analysis(filename="error_analysis_OCGraetz2_h_0.029_mu_1e5_alpha_0.01")
 
 
 # ### 4.8. Perform a speedup analysis
 
 # In[ ]:
 
-pod_galerkin_method.speedup_analysis()
+pod_galerkin_method.speedup_analysis(filename="speedup_analysis_OCGraetz2_h_0.029_mu_1e5_alpha_0.01")
 
 
 

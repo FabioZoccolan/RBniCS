@@ -39,6 +39,7 @@ def EllipticOptimalControlReducedProblem(ParametrizedReducedDifferentialProblem_
 
         # Perform an online evaluation of the cost functional
         def _compute_output(self, N):
+            
             assembled_operator = dict()
             for term in ("g", "h", "m", "n"):
                 assert self.terms_order[term] in (0, 1, 2)
@@ -56,7 +57,7 @@ def EllipticOptimalControlReducedProblem(ParametrizedReducedDifferentialProblem_
                 - transpose(assembled_operator["g"]) * self._solution
                 + 0.5 * assembled_operator["h"]
             )
-
+            
         # If a value of N was provided, make sure to double it when dealing with y and p, due to
         # the aggregated component approach
         def _online_size_from_kwargs(self, N, **kwargs):

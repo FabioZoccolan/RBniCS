@@ -130,8 +130,8 @@ def OnlineRectificationDecoratedReducedProblem(EllipticOptimalControlProblem_Der
                     return self.operator["projection_truth_snapshots"]
                 elif current_stage == "offline_rectification_postprocessing":
                     # the affine expansion storage contains only the inner product matrix
-                    assert len(self.truth_problem.inner_product) == 1
-                    inner_product = self.truth_problem.inner_product[0]
+                    assert len(self.truth_problem.inner_product) == 3 #1
+                    inner_product = self.truth_problem.inner_product[1] #0
                     for n in range(1, self.N + 1):
                         # the affine expansion storage contains only the inner product matrix
                         assert len(self.inner_product) == 1

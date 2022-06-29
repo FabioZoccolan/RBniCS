@@ -91,6 +91,7 @@ def WeightedUncertaintyQuantificationDecoratedReductionMethod(EllipticOptimalCon
                 print("Snapshot type is", type(snapshot))
                 self.POD["y"].store_snapshot(snapshot, component="y", weight=weight(self.truth_problem.mu))
                 self.POD["u"].store_snapshot(snapshot, component="u", weight=weight(self.truth_problem.mu))
-                self.POD["p"].store_snapshot(snapshot, component="p", weight=weight(self.truth_problem.mu))
+                self.POD["p"].store_snapshot(snapshot, component="p", weight=weight(self.truth_problem.mu))               
+                print("The assigned weight is:", weight(self.truth_problem.mu))
     # return value (a class) for the decorator
     return WeightedUncertaintyQuantificationDecoratedReductionMethod_Class

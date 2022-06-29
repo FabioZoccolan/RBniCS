@@ -10,6 +10,7 @@ from rbnics.sampling.distributions.equispaced_distribution import EquispacedDist
 
 class CompositeDistribution(Distribution):
     def __init__(self, distributions):
+        print("CompositeDistribution has been initialized. Parameters are")
         self.distributions = distributions
         # Create a dict from scalar distribution to component
         self.distribution_to_components = dict()
@@ -18,8 +19,9 @@ class CompositeDistribution(Distribution):
             if distribution not in self.distribution_to_components:
                 self.distribution_to_components[distribution] = list()
             self.distribution_to_components[distribution].append(p)
+        print("CompositeDistribution finished")
 
-    def sample(self, box, n):
+    def sample(self, box, n, quadrature=0, typeGrid=0):
         # Divide box among the different distributions
         distribution_to_sub_box = dict()
         for (distribution, components) in self.distribution_to_components.items():

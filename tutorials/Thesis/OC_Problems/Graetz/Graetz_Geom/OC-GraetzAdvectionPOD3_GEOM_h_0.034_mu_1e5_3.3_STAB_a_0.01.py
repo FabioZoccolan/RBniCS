@@ -240,7 +240,7 @@ print("Dim: ", V.dim() )
 """### 4.3. Allocate an object of the EllipticOptimalControl class"""
 
 problem = EllipticOptimalControl(V, subdomains=subdomains, boundaries=boundaries)
-mu_range = [(0.01, 1e6), (0.5, 4.0)]
+mu_range = [(1e4, 1e6), (0.5, 4.0)]
 problem.set_mu_range(mu_range)
 
 

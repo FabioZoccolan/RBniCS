@@ -118,10 +118,10 @@ print("FE dim", V.dim())
 
 # 3. Allocate an object of the AdvectionDominated class
 problem = AdvectionDominated(V, subdomains=subdomains, boundaries=boundaries)
-mu_range = [(0.01, 1e6), (0.5,4.0)]
+mu_range = [(1e4, 1e6),]
 problem.init()
 problem.set_mu_range(mu_range)
-offline_mu = (1e5, 1.0)
+offline_mu = (1e5,)
 
 problem.set_mu(offline_mu)
 problem.solve()
@@ -129,18 +129,18 @@ problem.export_solution(filename="FEM_Graetz_NOSTAB_N_5503_offline_mu_1e5")
 
 
 # 4. Prepare reduction with a reduced basis method
-reduction_method = PODGalerkin(advection_dominated_problem)
+reduction_method = PODGalerkin(problem)
 reduction_method.set_Nmax(50)
 reduction_method.set_tolerance(1e-7)
 
 # 5. Perform the offline phase
-lifting_mu = (1e5, 1.0)
+lifting_mu = (1e5,)
 problem.set_mu(lifting_mu)
-reduction_method.initialize_training_set(200)
+reduction_method.initialize_training_set(100)
 reduced_problem = reduction_method.offline()
 
 # 6. Perform an online solve
-online_mu = (1e5, 1.0)
+online_mu = (1e5,)
 reduced_problem.set_mu(online_mu)
 reduced_problem.solve(online_stabilization=True)
 reduced_problem.export_solution(filename="online_solution_Graetz_NOSTAB_N_5503_with_stabilization_mu_1e5")

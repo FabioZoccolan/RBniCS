@@ -30,16 +30,16 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         self.ds = Measure("ds")(subdomain_data=self.boundaries)
         # Regularization coefficient
         self.alpha = 0.01
-        self.y_d = Constant(2.0)
+        self.y_d = Constant(1.0)
         # Store the velocity expression
         self.vel = Expression("x[1] * (1 - x[1])", degree=1, domain=mesh)
         #self.lifting = Expression('((x[0] >= 1 && x[0] <= 2) && (x[1] == 1.0 || x[1]== 0.0) ) ? 1. : 0.', degree=1, domain=mesh)
         
         
-        self.y_0 = Constant("1.0") #Expression("1.0*((x[0] >= 1 && x[0] <= 2) && (x[1] == 1.0 || x[1]== 0.0))", degree=1, domain=mesh) #self.y_0 = Expression("1.0-1.0*(x[0]==0)-1.0*( x[0] <= 1)*(x[1]==0)-1.0*(x[0] <= 1)*( x[1]==1) ", degree=1, domain=mesh)
+        self.y_0 = Constant("0.0") #Expression("1.0*((x[0] >= 1 && x[0] <= 2) && (x[1] == 1.0 || x[1]== 0.0))", degree=1, domain=mesh) #self.y_0 = Expression("1.0-1.0*(x[0]==0)-1.0*( x[0] <= 1)*(x[1]==0)-1.0*(x[0] <= 1)*( x[1]==1) ", degree=1, domain=mesh)
         
         
-        self.delta = 2.0
+        self.delta = 1.0
         
         self.h = CellDiameter(block_V.mesh())
         
@@ -165,10 +165,10 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
                 as1_0[i, i] = - dt*vel*p[i].dx(0)*z[i]*dx                
                 as2_0[i, i] = dt*h * vel * p[i].dx(0) * z[i].dx(0) * dx
                 ms_0[i, i] = + inner(z[i],p[i])*dx 
-                ms_1[i, i] = - h * inner(p[i].dx(0), z[i])*dx 
+                ms_1[i, i] = - h * inner(p[i], z[i].dx(0))*dx 
             for i in range(Nt-1):
                 ms_0[i+1, i] = - inner(p[i+1], z[i])*dx
-                ms_1[i+1, i] = + h*inner(p[i+1].dx(0), z[i])*dx 
+                ms_1[i+1, i] = + h*inner(p[i+1], z[i].dx(0))*dx 
             as0 = [[0, 0, as0_0], [0, 0, 0], [0, 0, 0]]
             as1 = [[0, 0, as1_0], [0, 0, 0], [0, 0, 0]]
             as2 = [[0, 0, as2_0], [0, 0, 0], [0, 0, 0]]
@@ -247,11 +247,11 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
             h0 = y_d * y_d * dx(3, domain=mesh) + y_d * y_d * dx(4, domain=mesh) 
             return (h0,)
         elif term == "dirichlet_bc_y":
-            bc0 = BlockDirichletBC([[[DirichletBC(block_V.sub(i), Constant(1.0), self.boundaries, 1),
+            bc0 = BlockDirichletBC([[[DirichletBC(block_V.sub(i), Constant(0.0), self.boundaries, 1),
                                       DirichletBC(block_V.sub(i), Constant(1.0), self.boundaries, 2),
                                       DirichletBC(block_V.sub(i), Constant(1.0), self.boundaries, 4),
-                                      DirichletBC(block_V.sub(i), Constant(1.0), self.boundaries, 5),
-                                      DirichletBC(block_V.sub(i), Constant(1.0), self.boundaries, 6)] for i in range(0, Nt)], None, None])
+                                      DirichletBC(block_V.sub(i), Constant(0.0), self.boundaries, 5),
+                                      DirichletBC(block_V.sub(i), Constant(0.0), self.boundaries, 6)] for i in range(0, Nt)], None, None])
             return (bc0,)
         elif term == "dirichlet_bc_p":
             bc0 = BlockDirichletBC([None, None, [[DirichletBC(block_V.sub(i), Constant(0.0), self.boundaries, 1),
@@ -297,8 +297,8 @@ boundaries = MeshFunction("size_t", mesh, "data/graetzOC_h_0.040_facet_region.xm
 print("hMax: ", mesh.hmax() )
 
 # Create Finite Element space (Lagrange P1)
-T = 1.0
-dt = 0.5
+T = 0.5
+dt = 0.1
 Nt = int(ceil(T/dt))
 
 # BOUNDARY RESTRICTIONS #

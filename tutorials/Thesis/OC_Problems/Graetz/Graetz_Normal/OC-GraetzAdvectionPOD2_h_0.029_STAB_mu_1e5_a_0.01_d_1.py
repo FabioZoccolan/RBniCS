@@ -34,7 +34,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
         
         # Store the velocity expression
         self.vel = Expression("x[1] * (1 - x[1])", element=self.V.sub(0).ufl_element())
-        self.lifting = Expression('((x[0] >= 1 && x[0] <= 2) && (x[1] == 1.0 || x[1]== 0.0) ) ? 1. : 0.', degree=1, domain=mesh)
+        #self.lifting = Expression('((x[0] >= 1 && x[0] <= 2) && (x[1] == 1.0 || x[1]== 0.0) ) ? 1. : 0.', degree=1, domain=mesh)
         # Customize linear solver parameters
         self._linear_solver_parameters.update({
             "linear_solver": "mumps"
@@ -42,7 +42,7 @@ class EllipticOptimalControl(EllipticOptimalControlProblem):
 
     # Return custom problem name
     def name(self):
-        return "AdvectionOCGraetzPOD2_h_0.029_STAB_mu_1e5_alpha_0.01"
+        return "Article/AdvectionOCGraetzPOD2_h_0.029_STAB_mu_1e5_alpha_0.01"
 
     # Return theta multiplicative terms of the affine expansion of the problem.
     def compute_theta(self, term):
@@ -266,9 +266,9 @@ print("NOT ONLINE STAB: Reduced output for mu =", online_mu, "is", reduced_ellip
 reduced_elliptic_optimal_control.export_solution(filename="online_solution_OCGraetz2_h_0.029_OffSTAB_mu_1e5_alpha_0.01")
 reduced_elliptic_optimal_control.export_error(filename="online_error_OCGraetz2_h_0.029_OffSTAB_mu_1e5_alpha_0.01")
 
-reduced_solution_N_3 = reduced_elliptic_optimal_control.solve(online_stabilization=False, N = 3) 
-reduced_elliptic_optimal_control.export_solution(filename="online_solution_OCGraetz2_h_0.029_OffSTAB_mu_1e5_alpha_0.01_N_3")
-reduced_elliptic_optimal_control.export_error(filename="online_error_OCGraetz2_h_0.029_OffSTAB_mu_1e5_alpha_0.01_N_3")
+reduced_solution_N_1 = reduced_elliptic_optimal_control.solve(online_stabilization=False, N = 1) 
+reduced_elliptic_optimal_control.export_solution(filename="online_solution_OCGraetz2_h_0.029_OffSTAB_mu_1e5_alpha_0.01_testing_N_1")
+reduced_elliptic_optimal_control.export_error(filename="online_error_OCGraetz2_h_0.029_OffSTAB_mu_1e5_alpha_0.01_testing_N_1")
 
 reduced_solution = reduced_elliptic_optimal_control.solve(online_stabilization=True) 
 
@@ -276,16 +276,17 @@ print("ONLINE STAB: Reduced output for mu =", online_mu, "is", reduced_elliptic_
 reduced_elliptic_optimal_control.export_solution(filename="online_solution_OCGraetz2_h_0.029_OffONSTAB_mu_1e5_alpha_0.01")
 reduced_elliptic_optimal_control.export_error(filename="online_error_OCGraetz2_h_0.029_OffONSTAB_mu_1e5_alpha_0.01")
 
-reduced_solution_N_3 = reduced_elliptic_optimal_control.solve(online_stabilization=True, N = 3) 
-reduced_elliptic_optimal_control.export_solution(filename="online_solution_OCGraetz2_h_0.029_OffONSTAB_mu_1e5_alpha_0.01_N_3")
-reduced_elliptic_optimal_control.export_error(filename="online_error_OCGraetz2_h_0.029_OffONSTAB_mu_1e5_alpha_0.01_N_3")
+reduced_solution_N_6 = reduced_elliptic_optimal_control.solve(online_stabilization=True, N = 6) 
+reduced_elliptic_optimal_control.export_solution(filename="online_solution_OCGraetz2_h_0.029_OffONSTAB_mu_1e5_alpha_0.01_testing_N_6")
+reduced_elliptic_optimal_control.export_error(filename="online_error_OCGraetz2_h_0.029_OffONSTAB_mu_1e5_alpha_0.01_testing_N_6")
+
 
 # ### 4.7. Perform an error analysis
 
 # In[ ]:
 
 
-pod_galerkin_method.initialize_testing_set(100)
+pod_galerkin_method.initialize_testing_set(100, enable_import=True)
 
 print("\n----------------------------------------OFFLINE STABILIZATION ERROR ANALYSIS BEGINS-------------------------------------------------\n")
 

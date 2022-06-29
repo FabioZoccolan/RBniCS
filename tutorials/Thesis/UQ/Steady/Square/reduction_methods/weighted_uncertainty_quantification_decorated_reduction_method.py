@@ -20,21 +20,29 @@ def WeightedUncertaintyQuantificationDecoratedReductionMethod(EllipticOptimalCon
     class WeightedUncertaintyQuantificationDecoratedReductionMethod_Class_Base(
             EllipticOptimalControlReductionMethod_DerivedClass):
         def __init__(self, truth_problem, **kwargs):
+            print("In WEIGHTED UQ CLASS _init_")
             EllipticOptimalControlReductionMethod_DerivedClass.__init__(self, truth_problem, **kwargs)
             self.weight = None
             self.training_set_density = None
+            print("Exit WEIGHTED UQ CLASS _init_")
 
-        def initialize_training_set(self, ntrain, enable_import=True, sampling=None, weight=None, **kwargs):
+        def initialize_training_set(self, ntrain, enable_import=True, sampling=None, weight=None, **kwargs):  
+            print("\n*Started initialize_training_set of WeightedUQ class\n")
             import_successful = EllipticOptimalControlReductionMethod_DerivedClass.initialize_training_set(
                 self, ntrain, enable_import, sampling, **kwargs)
+            print("\n**Finished initialize_training_set of WeightedUQ class\n")
             self.weight = weight
             return import_successful
+            
 
         def _offline(self):
             # Initialize densities
+            print("*WeightedUQ._offline::started\n")
             tranining_set_and_first_mu = [mu for mu in self.training_set]
             tranining_set_and_first_mu.append(self.truth_problem.mu)
+            print("tranining_set_and_first_mu=", tranining_set_and_first_mu)
             if self.weight is not None:
+                print("Weights will be assigned according to the Probability Density and the chosen Quadrature Formula")
                 self.training_set_density = dict(zip(
                     tranining_set_and_first_mu, self.weight.density(
                         self.truth_problem.mu_range, tranining_set_and_first_mu)))
@@ -43,6 +51,7 @@ def WeightedUncertaintyQuantificationDecoratedReductionMethod(EllipticOptimalCon
 
             # Call Parent method
             EllipticOptimalControlReductionMethod_DerivedClass._offline(self)
+            print("**WeightedUQ._offline::finished\n")
 
     if hasattr(EllipticOptimalControlReductionMethod_DerivedClass, "greedy"):  # RB reduction
         @PreserveClassName
@@ -90,7 +99,10 @@ def WeightedUncertaintyQuantificationDecoratedReductionMethod(EllipticOptimalCon
                     return sqrt(self.training_set_density[mu])
                 print("Snapshot type is", type(snapshot))
                 self.POD["y"].store_snapshot(snapshot, component="y", weight=weight(self.truth_problem.mu))
+                print("Weight - y := ",  weight(self.truth_problem.mu))
                 self.POD["u"].store_snapshot(snapshot, component="u", weight=weight(self.truth_problem.mu))
+                print("Weight - u := ",  weight(self.truth_problem.mu))
                 self.POD["p"].store_snapshot(snapshot, component="p", weight=weight(self.truth_problem.mu))
+                print("Weight - p := ",  weight(self.truth_problem.mu))
     # return value (a class) for the decorator
     return WeightedUncertaintyQuantificationDecoratedReductionMethod_Class

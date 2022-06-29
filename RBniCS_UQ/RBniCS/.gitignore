@@ -1,0 +1,17 @@
+*~
+*.bak
+*.benchmarks
+*.cache
+*.egg
+*.egg-info
+*.h5
+*.m
+*.pvd
+*.pvtu
+*.py[cdo]
+*.vtu
+*.xdmf
+.pytest_cache
+build
+dist
+rbnics_till_25_NOV

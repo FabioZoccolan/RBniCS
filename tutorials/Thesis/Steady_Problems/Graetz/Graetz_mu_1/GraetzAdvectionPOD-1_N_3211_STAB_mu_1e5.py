@@ -130,7 +130,7 @@ problem.export_solution(filename="FEM_Graetz_STAB_N_3211_offline_mu_1e5_d_1")
 
 
 # 4. Prepare reduction with a reduced basis method
-reduction_method = PODGalerkin(advection_dominated_problem)
+reduction_method = PODGalerkin(problem)
 reduction_method.set_Nmax(50)
 reduction_method.set_tolerance(1e-7)
 
