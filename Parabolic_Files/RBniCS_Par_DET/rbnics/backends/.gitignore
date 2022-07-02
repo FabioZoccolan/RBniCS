@@ -1,0 +1,37 @@
+# Ignore everything ...
+*
+*/
+# ... except this file ...
+!.gitignore
+# ... __init__ file of this package ...
+!__init__.py
+# ... abastract subpackage ...
+!abstract/
+!abstract/**
+abstract/**/*~
+abstract/**/*.bak
+abstract/**/*.py[cdo]
+# ... basic subpackage ...
+!basic/
+!basic/**
+basic/**/*~
+basic/**/*.bak
+basic/**/*.py[cdo]
+# ... common subpackage ...
+!common/
+!common/**
+common/**/*~
+common/**/*.bak
+common/**/*.py[cdo]
+# ... dolfin subpackage ...
+!dolfin/
+!dolfin/**
+dolfin/**/*~
+dolfin/**/*.bak
+dolfin/**/*.py[cdo]
+# ... online subpackage ...
+!online/
+!online/**
+online/**/*~
+online/**/*.bak
+online/**/*.py[cdo]

@@ -1,0 +1,16 @@
+*~
+*.bak
+*.benchmarks
+*.cache
+*.egg
+*.egg-info
+*.h5
+*.m
+*.pvd
+*.pvtu
+*.py[cdo]
+*.vtu
+*.xdmf
+.pytest_cache
+build
+dist
